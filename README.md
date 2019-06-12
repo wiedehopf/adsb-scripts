@@ -9,6 +9,7 @@ Solutions to common problems using dump1090 variants and ADS-B feeders
 - installs dump1090-fa
 - makes it possible to change gain without editing a file
 
+To use the install script, just paste or enter the following command:
 ```
 sudo bash -c "$(wget -O - https://raw.githubusercontent.com/wiedehopf/adsb-wiki/master/install-dump1090-fa.sh)"
 ```
