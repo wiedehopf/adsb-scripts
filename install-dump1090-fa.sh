@@ -24,9 +24,13 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 # configure fr24feed to use dump1090-fa
 
-chmod a+rw /etc/fr24feed.ini
-cp -n /etc/fr24feed.ini /etc/fr24feed.ini.backup
-sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
+if [ -f /etc/fr24feed.ini ]
+then
+	chmod a+rw /etc/fr24feed.ini
+	cp -n /etc/fr24feed.ini /etc/fr24feed.ini.backup
+	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
+else
+	echo "no fr24feed configuration found, if you are using fr24feed run sudo fr24feed --signup or use the fr24feed install script"fi
 
 systemctl daemon-reload
 systemctl restart fr24feed dump1090-fa
