@@ -2,29 +2,30 @@
 repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.7.1_all.deb"
 
 #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
-mount -o remount ,rw /
+mount -o remount,rw /
 sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
 apt-get update
+
 if ! apt-get install --reinstall -y dump1090-fa
 then
 	echo "Couldn't install dump1090-fa! (Maybe try again?)"
 	exit 1
 fi
+
 systemctl stop fr24feed
 
-apt-get remove -y dump1090-mutability
-apt-get remove -y dump1090
-rm /etc/lighttpd/conf-enabled/89-dump1090.conf
+apt-get remove -y dump1090-mutability &>/dev/null
+apt-get remove -y dump1090 &>/dev/null
+rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
+
+# configure fr24feed to use dump1090-fa
 
 chmod a+rw /etc/fr24feed.ini
 cp -n /etc/fr24feed.ini /etc/fr24feed.ini.backup
-
-
-# configure fr24feed to use dump1090-fa
 sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
 
 systemctl daemon-reload
