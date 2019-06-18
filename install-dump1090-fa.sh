@@ -43,6 +43,10 @@ mkdir -p /usr/local/bin
 cat >/usr/local/bin/dump1090-fa-gain <<EOF
 #!/bin/bash
 gain=\$(echo \$1 | tr -cd '[:digit:].-')
+if [ -f /boot/piaware-config.txt ]
+then
+	sudo piaware-config rtlsdr-gain 20
+fi
 sudo sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain \$gain /" /etc/default/dump1090-fa
 sudo systemctl restart dump1090-fa
 EOF
