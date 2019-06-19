@@ -38,3 +38,25 @@ Available gain settings:
 See the explanation here:
 https://github.com/wiedehopf/adsb-wiki/wiki/Installing-dump1090-fa#4-configuring-dump1090-fa-location
 
+## 2. Automatic gain adjustment for dump1090-fa
+
+- only for rtl-sdr/DVB-T USB receiver, not Airspy or Beast receivers
+- at 2:45 in the morning, the gain is changed and dump1090-fa restarted
+- changes gain by one step every night, only if required
+- uses "strong signals" to determine if gain should be changed
+- if the percentage of strong signals is greater than 5 percent -> gain is reduced
+- if the percentage of strong signals is less than 1 percent -> gain is increased
+- thresholds adjustable in /etc/default/dump1090-fa-autogain
+
+#### Installation:
+
+```
+sudo bash -c "$(wget -O - https://raw.githubusercontent.com/wiedehopf/adsb-wiki/master/dump1090-fa-autogain.sh)"
+```
+
+#### Removal / Deinstallation:
+
+```
+sudo rm /etc/cron.d/dump1090-fa-autogain
+```
+
