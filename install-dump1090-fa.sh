@@ -40,14 +40,16 @@ systemctl restart fr24feed dump1090-fa
 # script to change gain
 
 mkdir -p /usr/local/bin
-cat >/usr/local/bin/dump1090-fa-gain <<EOF
+cat >/usr/local/bin/dump1090-fa-gain <<"EOF"
 #!/bin/bash
-gain=\$(echo \$1 | tr -cd '[:digit:].-')
+gain=$(echo $1 | tr -cd '[:digit:].-')
+if [[ $gain == "" ]]; then echo "Error, invalid gain!"; exit 1; fi
 if [ -f /boot/piaware-config.txt ]
 then
 	sudo piaware-config rtlsdr-gain 20
 fi
-sudo sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain \$gain /" /etc/default/dump1090-fa
+if ! grep gain /etc/default/dump1090-fa &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/dump1090-fa; fi
+sudo sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain $gain /" /etc/default/dump1090-fa
 sudo systemctl restart dump1090-fa
 EOF
 chmod a+x /usr/local/bin/dump1090-fa-gain
