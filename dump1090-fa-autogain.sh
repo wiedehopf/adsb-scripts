@@ -17,20 +17,20 @@ for i in "${!ga[@]}"; do
 done
 
 if ! awk "BEGIN{ exit ($strong > $low) }" && ! awk "BEGIN{ exit ($strong < $high) }"
-then echo "No gain change needed, percentage of messages >-3dB is in nominal range."; exit 0; fi
+then echo "No gain change needed, percentage of messages >-3dB is in nominal range. (${strong}%)"; exit 0; fi
 
 if ! awk "BEGIN{ exit ($strong < $low) }"
-then gain_index=$(($gain_index+1)); fi
+then gain_index=$(($gain_index+1)); action=Increasing; fi
 
 if ! awk "BEGIN{ exit ($strong > $high) }" && [[ $gain_index == 0 ]]
-then echo "Gain already at minimum!"; exit 0; fi
+then echo "Gain already at minimum! (${strong}% messages >-3dB)"; exit 0; fi
 
 if ! awk "BEGIN{ exit ($strong > $high) }"
-then gain_index=$(($gain_index-1)); fi
+then gain_index=$(($gain_index-1)); action=Decreasing; fi
 
 gain="${ga[$gain_index]}"
 
-if [[ $gain == "" ]]; then echo "Gain already at maximum!"; exit 0; fi
+if [[ $gain == "" ]]; then echo "Gain already at maximum! (${strong}% messages >-3dB)"; exit 0; fi
 
 if [ -f /boot/piaware-config.txt ]
 then
@@ -39,7 +39,7 @@ fi
 if ! grep gain /etc/default/dump1090-fa &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/dump1090-fa;fi
 sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain $gain /" /etc/default/dump1090-fa
 systemctl restart dump1090-fa
-echo "Gain changed to $gain"
+echo "$action gain to $gain (${strong}% messages >-3dB)"
 EOF
 chmod a+x /usr/local/bin/dump1090-fa-autogain
 
