@@ -17,7 +17,10 @@ for i in "${!ga[@]}"; do
 done
 
 if ! awk "BEGIN{ exit ($strong > $low) }" && ! awk "BEGIN{ exit ($strong < $high) }"
-then echo "No gain change needed, percentage of messages >-3dB is in nominal range. (${strong}%)"; exit 0; fi
+then echo "No gain change needed, percentage of messages >-3dB is in nominal range. (${strong}%)"
+	if [[ $(date +%w) == 0 ]]; then systemctl restart dump1090-fa; fi
+	exit 0
+fi
 
 if ! awk "BEGIN{ exit ($strong < $low) }"
 then gain_index=$(($gain_index+1)); action=Increasing; fi
