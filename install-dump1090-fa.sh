@@ -31,7 +31,8 @@ then
 	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
 	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
 else
-	echo "no fr24feed configuration found, if you are using fr24feed run sudo fr24feed --signup or use the fr24feed install script"
+	echo "No fr24feed configuration found, if you are using fr24feed run sudo fr24feed --signup or use the fr24feed install script"
+	echo "After installing/configuring fr24feed, rerun this script to change the configuration for use of dump1090-fa"
 fi
 
 systemctl daemon-reload
