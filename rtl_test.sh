@@ -40,7 +40,7 @@ echo "-----"
 echo "Starting 30 second rtl_test, standby!"
 echo "-----"
 
-timeout 30 rtl_test -s 24000000
+timeout 30 rtl_test -s 2400000
 
 echo "-----"
 echo "Test finished, there should be no or only few lost samples!"
