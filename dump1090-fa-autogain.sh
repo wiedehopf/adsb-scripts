@@ -61,10 +61,31 @@ ga=(0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.
 EOF
 fi
 
-cat >/etc/cron.d/dump1090-fa-autogain <<"EOF"
-45 2 * * * root /bin/bash /usr/local/bin/dump1090-fa-autogain
+rm -f /etc/cron.d/dump1090-fa-autogain
 
+cat >/lib/systemd/system/dump1090-fa-autogain.service <<"EOF"
+[Unit]
+Description=autogain for dump1090-fa
+
+[Service]
+ExecStart=/usr/local/bin/dump1090-fa-autogain
 EOF
+
+cat >/lib/systemd/system/dump1090-fa-autogain.timer <<"EOF"
+[Unit]
+Description=Nightly automic gain adjustment for dump1090-fa
+
+[Timer]
+OnCalendar=Mon..Sun 02:45
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl enable dump1090-fa-autogain.timer
+systemctl restart dump1090-fa-autogain.timer
+
 
 echo --------------
 echo "All done!"
