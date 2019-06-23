@@ -76,7 +76,8 @@ cat >/lib/systemd/system/dump1090-fa-autogain.timer <<"EOF"
 Description=Nightly automic gain adjustment for dump1090-fa
 
 [Timer]
-OnCalendar=Mon..Sun 02:45
+OnCalendar=Mon..Sun 02:30
+RandomizedDelaySec=30m
 
 [Install]
 WantedBy=timers.target
