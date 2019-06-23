@@ -18,9 +18,10 @@ then
 	do
 		systemctl stop $i 2>/dev/null
 	done
+	pkill -9 dump1090
 fi
 
-if pgrep -a dump1090
+if pgrep -l dump1090
 then
 	echo "dump1090 is still running, can't test the rtl-sdr receiver"
 	exit 1
@@ -43,6 +44,8 @@ timeout 30 rtl_test -s 24000000
 
 echo "-----"
 echo "Test finished, there should be no or only few lost samples!"
+echo "Many lost samples or other errors probably mean the receiver isn't working correctly."
+echo "Try another power supply before condemning the receiver though!"
 echo "-----"
 
 systemctl restart fr24feed
