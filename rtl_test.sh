@@ -55,7 +55,7 @@ fi
 if [[ "throttled=0x0" != $(vcgencmd get_throttled) ]]
 then
 	echo "-------"
-	dmesg --ctime | grep voltage
+	dmesg --ctime | grep voltage | tail -n15
 	echo "-------"
 	echo "Your power supply is not adequate, consider the Official Raspberry Pi power supply."
 	echo "Any constant voltage supply with 5.1 to 5.2 Volts and 2.5A capability is also a good choice."
