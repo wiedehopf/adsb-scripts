@@ -117,6 +117,11 @@ RandomizedDelaySec=30m
 WantedBy=timers.target
 EOF
 
+if grep jessie /etc/os-release >/dev/null; then
+	sed -i -e '/Randomized/d' /lib/systemd/system/dump1090-fa-autogain.timer
+fi
+
+
 systemctl daemon-reload
 systemctl enable dump1090-fa-autogain.timer
 systemctl restart dump1090-fa-autogain.timer
