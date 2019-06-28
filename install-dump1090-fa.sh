@@ -22,7 +22,8 @@ systemctl stop fr24feed
 
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
-rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
+
+mv /etc/lighttpd/conf-enabled/89-dump1090.conf /usr/local/share/adsb-wiki
 
 # configure fr24feed to use dump1090-fa
 
