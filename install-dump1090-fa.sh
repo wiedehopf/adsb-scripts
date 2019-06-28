@@ -5,7 +5,8 @@ repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/pi
 mount -o remount,rw /
 sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 
-mkdir -p /usr/local/share/adsb-wiki
+ipath=/usr/local/share/adsb-wiki
+mkdir -p $ipath
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
@@ -23,7 +24,7 @@ systemctl stop fr24feed
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 
-mv /etc/lighttpd/conf-enabled/89-dump1090.conf /usr/local/share/adsb-wiki
+mv /etc/lighttpd/conf-enabled/89-dump1090.conf $ipath
 
 # configure fr24feed to use dump1090-fa
 
