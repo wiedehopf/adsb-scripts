@@ -13,7 +13,9 @@ mv /usr/local/share/adsb-wiki/fr24feed.ini /etc/fr24feed.ini
 
 
 systemctl daemon-reload
+systemctl start fr24feed
 systemctl restart fr24feed
+systemctl restart lighttpd
 
 
 echo --------------
