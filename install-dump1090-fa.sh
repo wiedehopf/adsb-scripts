@@ -5,6 +5,8 @@ repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/pi
 mount -o remount,rw /
 sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 
+mkdir -p /usr/local/share/adsb-wiki
+
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
@@ -27,7 +29,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 if [ -f /etc/fr24feed.ini ]
 then
 	chmod a+rw /etc/fr24feed.ini
-	cp -n /etc/fr24feed.ini /etc/fr24feed.ini.backup
+	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki
 	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
 	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
 else
