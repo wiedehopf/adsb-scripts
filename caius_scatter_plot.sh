@@ -8,9 +8,9 @@ rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_aircra
 
 # Remove headers and extraneous :
 
-sed -i 's/://' /tmp/messages_l
-sed -i 's/://' /tmp/messages_r
-sed -i 's/://' /tmp/aircraft
+sed -i -e 's/://' -e 's/\,/\./g' /tmp/messages_l
+sed -i -e 's/://' -e 's/\,/\./g' /tmp/messages_r
+sed -i -e 's/://' -e 's/\,/\./g' /tmp/aircraft
 
 sed -i -e '1d;2d' /tmp/messages_l
 sed -i -e '1d;2d' /tmp/messages_r
