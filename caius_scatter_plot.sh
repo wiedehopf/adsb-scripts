@@ -2,9 +2,9 @@
 
 # Fetch daily data from rrds
 
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-local_accepted.rrd AVERAGE -e midnight today -s end-1day -r 3m -a > /tmp/messages_l
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-remote_accepted.rrd AVERAGE -e midnight today -s end-1day -r 3m -a > /tmp/messages_r
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_aircraft-recent.rrd AVERAGE -e midnight today -s end-1day -r 3m -a > /tmp/aircraft
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-local_accepted.rrd AVERAGE -e midnight today -s end-7day -r 3m -a > /tmp/messages_l
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-remote_accepted.rrd AVERAGE -e midnight today -s end-7day -r 3m -a > /tmp/messages_r
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_aircraft-recent.rrd AVERAGE -e midnight today -s end-7day -r 3m -a > /tmp/aircraft
 
 # Remove headers and extraneous :
 
