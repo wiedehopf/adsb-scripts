@@ -10,6 +10,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090-fa.conf
 rm -f /etc/lighttpd/conf-enabled/88-dump1090-fa-statcache.conf
 
 rm -f /usr/local/bin/dump1090-fa-gain
+rm -f /usr/local/bin/dump1090-fa-set-location
 
 echo "Restoring old fr24feed settings"
 mv $ipath/fr24feed.ini /etc/fr24feed.ini
