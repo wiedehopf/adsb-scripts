@@ -68,18 +68,27 @@ set ylabel 'Message rate'
 set cblabel 'Range nm'
 set grid xtics ytics
 set cbrange [lb:ub]
-set label sprintf("Peak range = %3.2f",Range_max) right at 250,800
-set label sprintf("Mean Maximum range = %3.2f",Range_mean) right at 250,760
-set label sprintf("Median Maximum range = %3.2f",Range_median) right at 250,720
-set label sprintf("Peak Message rate = %3.2f",Messages_max) right at 250,600
-set label sprintf("Mean Message rate = %3.2f",Messages_mean) right at 250,560
-set label sprintf("Median Message rate = %3.2f",Messages_median) right at 250,520
-set label sprintf("Peak Aircraft = %3.2f",Aircraft_max) right at 250,400
-set label sprintf("Mean Aircraft = %3.2f",Aircraft_mean) right at 250,360
-set label sprintf("Median Aircraft = %3.2f",Aircraft_median) right at 250,320
+set label 1 sprintf("Peak range = %3.2f",Range_max) right at graph 0.85,graph 0.4
+set label 2 sprintf("Mean Maximum range = %3.2f",Range_mean) right at graph 0.85,0.38
+set label 3 sprintf("Median Maximum range = %3.2f",Range_median) right at graph 0.85,0.36
+set label 4 sprintf("Peak Message rate = %3.2f",Messages_max) right at graph 0.85,0.3
+set label 5 sprintf("Mean Message rate = %3.2f",Messages_mean) right at graph 0.85,0.28
+set label 6 sprintf("Median Message rate = %3.2f",Messages_median) right at graph 0.85,0.26
+set label 7 sprintf("Peak Aircraft = %3.2f",Aircraft_max) right at graph 0.85,0.2
+set label 8 sprintf("Mean Aircraft = %3.2f",Aircraft_mean) right at graph 0.85,0.18
+set label 9 sprintf("Median Aircraft = %3.2f",Aircraft_median) right at graph 0.85,0.16
 
 plot    '/tmp/'.date.'-ranges' using ($4):($2+$3):($1/1852) with points lt palette notitle, f(x) lt rgb "black" notitle
 
+unset label 1
+unset label 2
+unset label 3
+unset label 4
+unset label 5
+unset label 6
+unset label 7
+unset label 8
+unset label 9
 unset xlabel
 unset xtics
 set size 0.1,0.95
