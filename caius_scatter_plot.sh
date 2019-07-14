@@ -46,11 +46,12 @@ set output 'range.png'
 set fit prescale
 FIT_LIMIT = 1.e-14
 
-f(x) = c*x/sqrt(d+x**2) + a*x**2 +b*x
-c=4000
-d=7000
-a=0.05
-b=-20
+f(x) = 3000*c*x/sqrt(6000*d+x**2) + a/20*x**2 - 10*b*x
+c=1
+d=1
+a=1
+b=1
+fit f(x) '/tmp/'.date.'-ranges' using ($4):($2+$3) via c,d
 fit f(x) '/tmp/'.date.'-ranges' using ($4):($2+$3) via a,b,c,d
 stats '/tmp/'.date.'-ranges' using ($1/1852) name "Range" noout
 stats '/tmp/'.date.'-ranges' using ($2+$3) name "Messages" noout
