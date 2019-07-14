@@ -45,14 +45,13 @@ set terminal pngcairo enhanced size 1900,900
 set output 'range.png'
 set fit prescale
 FIT_LIMIT = 1.e-10
-FIT_MAXITER = 50
+FIT_MAXITER = 100
 
-f(x) = 3000*c*x/sqrt(6000*d+x**2) + a/20*x**2 - 10*b*x
-c=1
-d=1
+f(x) = a/20*x**2 - 10*b*x + 3000*abs(c)*x/sqrt(6000*abs(d)+x**2)
 a=1
 b=1
-fit f(x) '/tmp/'.date.'-ranges' using ($4):($2+$3) via b
+c=1
+d=1
 fit f(x) '/tmp/'.date.'-ranges' using ($4):($2+$3) via a,b,c,d
 stats '/tmp/'.date.'-ranges' using ($1/1852) name "Range" noout
 stats '/tmp/'.date.'-ranges' using ($2+$3) name "Messages" noout
