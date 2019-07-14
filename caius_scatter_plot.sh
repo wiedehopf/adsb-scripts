@@ -44,7 +44,6 @@ gain = system("awk '{for(i=1;i<=NF;i++)if($i~/--gain/)print $(i+1)}' /etc/defaul
 set terminal pngcairo enhanced size 1900,900
 set output 'range.png'
 set fit prescale
-FIT_LIMIT = 1.e-14
 
 f(x) = 3000*c*x/sqrt(6000*d+x**2) + a/20*x**2 - 10*b*x
 c=1
