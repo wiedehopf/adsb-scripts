@@ -5,11 +5,20 @@
 date=$(date -I --date=yesterday)
 echo "Processing RRD data"
 
+#00 is the hour of the day
+end="00 today"
+duration="1week"
 
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-local_accepted.rrd AVERAGE -s end-7days -e midnight today -r 3m -a > /tmp/messages_l
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-remote_accepted.rrd AVERAGE -s end-7days -e midnight today -r 3m -a > /tmp/messages_r
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_range-max_range.rrd MAX -s end-7days -e midnight today -r 3m -a > /tmp/range
-rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_aircraft-recent.rrd AVERAGE -s end-7days -e midnight today -r 3m -a > /tmp/aircraft
+opts="-s end-$duration -e $end -r 3m -a"
+
+date '+%F %H:%M' --date="$end-$duration" > /tmp/plotstart
+date '+%F %H:%M' --date="$end" > /tmp/plotend
+
+
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-local_accepted.rrd AVERAGE $opts > /tmp/messages_l
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_messages-remote_accepted.rrd AVERAGE $opts > /tmp/messages_r
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_range-max_range.rrd MAX $opts > /tmp/range
+rrdtool fetch /var/lib/collectd/rrd/localhost/dump1090-localhost/dump1090_aircraft-recent.rrd AVERAGE $opts > /tmp/aircraft
 
 
 # Remove headers and extraneous :
@@ -31,37 +40,37 @@ sed -i -e '1d;2d' /tmp/aircraft
 
 join -o 1.1 1.2 2.2 /tmp/range /tmp/messages_l > /tmp/tmp
 join -o 1.1 1.2 1.3 2.2 /tmp/tmp /tmp/messages_r > /tmp/tmp1
-join -o 1.2 1.3 1.4 2.2 /tmp/tmp1 /tmp/aircraft > /tmp/$date-ranges
+join -o 1.2 1.3 1.4 2.2 /tmp/tmp1 /tmp/aircraft > /tmp/ranges
 
 cd /tmp
 
 echo "Generating plot"
 
 gnuplot /dev/stdin <<"EOF"
-date = system("date -I --date=yesterday")
-date1 = system("date -I --date=-7days")
+start = system("cat /tmp/plotstart")
+end = system("cat /tmp/plotend")
 gain = system("awk '{for(i=1;i<=NF;i++)if($i~/--gain/)print $(i+1)}' /etc/default/dump1090-fa")
 set terminal pngcairo enhanced size 1900,900
 set output 'range.png'
 set fit prescale
-FIT_LIMIT = 1.e-10
-FIT_MAXITER = 100
+FIT_LIMIT = 1.e-8
+FIT_MAXITER = 50
 
-f(x) = a/20*x**2 - 10*b*x + 3000*abs(c)*x/sqrt(6000*abs(d)+x**2)
+f(x) = (-abs(a)/500)*x**2 + 5*b*x + 1000*abs(c)*x/sqrt(4000*abs(d)+x**2)
 a=1
 b=1
 c=1
 d=1
-fit f(x) '/tmp/'.date.'-ranges' using ($4):($2+$3) via a,b,c,d
-stats '/tmp/'.date.'-ranges' using ($1/1852) name "Range" noout
-stats '/tmp/'.date.'-ranges' using ($2+$3) name "Messages" noout
-stats '/tmp/'.date.'-ranges' using ($4) name "Aircraft" noout
+fit f(x) '/tmp/ranges' using ($4):($2+$3) via a,b,c,d
+stats '/tmp/ranges' using ($1/1852) name "Range" noout
+stats '/tmp/ranges' using ($2+$3) name "Messages" noout
+stats '/tmp/ranges' using ($4) name "Aircraft" noout
 
 lb = (Range_mean - Range_stddev*2)
 ub = (Range_mean + Range_stddev*2)
 
 
-set multiplot layout 1,4 title 'Receiver performance '.date1.' to '.date.'      Dump1090-fa gain: '.gain
+set multiplot layout 1,4 title 'Receiver performance '.start.' to '.end.'      Dump1090-fa gain: '.gain
 
 set size 0.7,0.95
 set xlabel 'Aircraft'
@@ -79,7 +88,7 @@ set label 7 sprintf("Peak Aircraft = %3.2f",Aircraft_max) right at graph 0.85,0.
 set label 8 sprintf("Mean Aircraft = %3.2f",Aircraft_mean) right at graph 0.85,0.18
 set label 9 sprintf("Median Aircraft = %3.2f",Aircraft_median) right at graph 0.85,0.16
 
-plot    '/tmp/'.date.'-ranges' using ($4):($2+$3):($1/1852) with points lt palette notitle, f(x) lt rgb "black" notitle
+plot    '/tmp/ranges' using ($4):($2+$3):($1/1852) with points lt palette notitle, f(x) lt rgb "black" notitle
 
 unset label 1
 unset label 2
@@ -99,7 +108,7 @@ set style fill solid 0.5 border -1
 set style boxplot outliers pointtype 7
 set style data boxplot
 set pointsize 0.5
-plot '/tmp/'.date.'-ranges' using (1):($1/1852) notitle
+plot '/tmp/ranges' using (1):($1/1852) notitle
 
 unset xlabel
 unset xtics
@@ -110,7 +119,7 @@ set style fill solid 0.5 border -1
 set style boxplot outliers pointtype 7
 set style data boxplot
 set pointsize 0.5
-plot '/tmp/'.date.'-ranges' using (1):($2+$3) notitle
+plot '/tmp/ranges' using (1):($2+$3) notitle
 
 unset xlabel
 unset xtics
@@ -121,7 +130,7 @@ set style fill solid 0.5 border -1
 set style boxplot outliers pointtype 7
 set style data boxplot
 set pointsize 0.5
-plot '/tmp/'.date.'-ranges' using (1):($4) notitle
+plot '/tmp/ranges' using (1):($4) notitle
 
 unset multiplot
 
