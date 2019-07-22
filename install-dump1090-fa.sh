@@ -12,11 +12,22 @@ cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
 apt-get update
+apt-get install --reinstall -y dump1090-fa
 
-if ! apt-get install --reinstall -y dump1090-fa
-then
-	echo "Couldn't install dump1090-fa! (Maybe try again?)"
-	exit 1
+if ! /usr/bin/dump1090-fa --help >/dev/null; then
+	sed -i -e '0,/nameserver/{s/nameserver.*/nameserver 8.8.8.8/}' /etc/resolv.conf
+	sysctl -w net.ipv6.conf.all.disable_ipv6=0
+	sysctl -w net.ipv6.conf.default.disable_ipv6=0
+
+	wget --timeout=30 -q -O repository.deb $repository
+	dpkg -i repository.deb
+	apt-get update
+	apt-get install --reinstall -y dump1090-fa
+
+	if ! /usr/bin/dump1090-fa --help >/dev/null; then
+		echo "Couldn't install dump1090-fa! (Maybe try again?)"
+		exit 1
+	fi
 fi
 
 systemctl stop fr24feed

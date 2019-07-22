@@ -1,6 +1,5 @@
 #!/bin/bash
 clear
-set -e
 echo "--------------"
 echo "Bundle install for dump1090-fa by wiedehopf"
 echo "--------------"
