@@ -1,6 +1,7 @@
 #!/bin/bash
 repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.7.1_all.deb"
 
+
 #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
 mount -o remount,rw /
 sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
@@ -12,7 +13,7 @@ cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
 apt-get update
-apt-get install --reinstall -y dump1090-fa
+apt-get install --no-install-recommends --no-install-suggests --reinstall -y dump1090-fa
 
 if ! /usr/bin/dump1090-fa --help >/dev/null; then
 	sed -i -e '0,/nameserver/{s/nameserver.*/nameserver 8.8.8.8/}' /etc/resolv.conf
@@ -22,7 +23,7 @@ if ! /usr/bin/dump1090-fa --help >/dev/null; then
 	wget --timeout=30 -q -O repository.deb $repository
 	dpkg -i repository.deb
 	apt-get update
-	apt-get install --reinstall -y dump1090-fa
+	apt-get install --no-install-recommends --no-install-suggests --reinstall -y dump1090-fa
 
 	if ! /usr/bin/dump1090-fa --help >/dev/null; then
 		echo "Couldn't install dump1090-fa! (Maybe try again?)"
@@ -50,8 +51,13 @@ else
 	echo "After installing/configuring fr24feed, rerun this script to change the configuration for use of dump1090-fa"
 fi
 
+lighty-enable-mod dump1090-fa
+lighty-enable-mod dump1090-fa-statcache
+
 systemctl daemon-reload
-systemctl restart fr24feed dump1090-fa
+systemctl restart fr24feed
+systemctl restart dump1090-fa
+systemctl restart lighttpd
 
 # script to change gain
 

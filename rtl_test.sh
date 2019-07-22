@@ -3,7 +3,11 @@
 
 if ! dpkg -s rtl-sdr 2>/dev/null | grep 'Status.*installed' &>/dev/null
 then
-	if ! apt install rtl-sdr -y; then echo "Couldn't install rtl-sdr!"; exit 1; fi
+	if ! apt-get install --no-install-recommends --no-install-suggests --reinstall -y rtl-sdr
+	then
+		echo "Couldn't install rtl-sdr!"
+		exit 1
+	fi
 fi
 
 stop="piaware dump1090-fa dump1090-mutability dump1090 dump978-fa"
