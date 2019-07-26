@@ -1,0 +1,20 @@
+[Unit]
+Description=Flightradar24 Decoder & Feeder
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStartPre=-/usr/lib/fr24/install_dump1090.sh
+ExecStartPre=-/usr/lib/fr24/unregister_kernel_modules.sh
+ExecStartPre=-/usr/lib/fr24/create_missing_directories.sh
+ExecStart=/bin/bash -c "/usr/bin/fr24feed | sed -u -e 's/[0-9,-]* [0-9,:]* | //' | grep -F -e imeout -e rror -e info -e main -e onnect -e reader -e bytes -e '[mlat][i]Stats' --line-buffered | sed -u -e '/Stats [0-9]*[1-9]\\//d' -e '/Stats [0-9]*[1-9][0-9]\\//d'"
+User=fr24
+Group=fr24
+PermissionsStartOnly=true
+StandardOutput=syslog
+SyslogIdentifier=fr24feed
+
+[Install]
+WantedBy=multi-user.target
+
