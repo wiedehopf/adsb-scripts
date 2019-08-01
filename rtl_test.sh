@@ -67,7 +67,7 @@ then
 fi
 
 
-if [[ "throttled=0x0" != $(vcgencmd get_throttled) ]]
+if dmesg --ctime | grep voltage
 then
 	echo "-------"
 	dmesg --ctime | grep voltage | tail -n15
