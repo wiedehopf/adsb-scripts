@@ -23,11 +23,22 @@ then
 		systemctl stop $i 2>/dev/null
 	done
 	pkill -9 dump1090
+	for i in $stop
+	do
+		systemctl stop $i 2>/dev/null
+	done
+	pkill -9 dump1090
+	sleep 1
 fi
 
 if pgrep -l dump1090
 then
-	echo "dump1090 is still running, can't test the rtl-sdr receiver"
+	echo "dump1090 is still running, can't test the rtl-sdr receiver, please reboot and try again!"
+	for i in $stop
+	do
+		systemctl restart $i 2>/dev/null
+	done
+	systemctl restart fr24feed
 	exit 1
 fi
 
