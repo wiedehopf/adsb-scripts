@@ -140,3 +140,8 @@ EOF
 echo "Moving plot"
 
 sudo cp /tmp/range.png /run/dump1090-fa/graph.png
+
+IP=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+
+echo "Graph available at: http://$IP/dump1090-fa/data/graph.png"
+
