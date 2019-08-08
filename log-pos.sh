@@ -10,4 +10,5 @@ view1090-fa --no-interactive \
 		-e 's/ ft	  CPR latitude:  /,/' \
 		-e 's/ ([0-9]*)	  CPR longitude: /,/' \
 		-e 's/ ([0-9]*)	--//' \
-	| sed '/ /d'
+	| sed '/ /d' \
+	| perl -F, -ple '$_ = join ",", @F[3,2,0,1]'
