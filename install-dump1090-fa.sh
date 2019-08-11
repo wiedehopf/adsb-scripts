@@ -51,6 +51,8 @@ else
 	echo "After installing/configuring fr24feed, rerun this script to change the configuration for use of dump1090-fa"
 fi
 
+sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-fa
+
 lighty-enable-mod dump1090-fa
 lighty-enable-mod dump1090-fa-statcache
 
