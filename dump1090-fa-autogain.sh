@@ -15,8 +15,8 @@ source /etc/default/dump1090-fa-autogain
 
 if ! [[ -f $stats ]]; then echo "$stats not found, is dump1090-fa running?"; exit 0; fi
 
-oldstrong=$(cat $tmp/strong)
-oldtotal=$(cat $tmp/total)
+oldstrong=$(cat $tmp/strong 2>/dev/null)
+oldtotal=$(cat $tmp/total 2>/dev/null)
 if [[ -z $oldstrong ]] || [[ -z $oldtotal ]]; then
 	oldstrong=0
 	oldtotal=0
