@@ -1,5 +1,5 @@
 #!/bin/bash
-repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.7.1_all.deb"
+repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.7.2_all.deb"
 
 
 #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
