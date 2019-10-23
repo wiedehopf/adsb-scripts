@@ -9,6 +9,10 @@ sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep r
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
 
+# make sure the rtl-sdr rules are present
+wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/osmocom/rtl-sdr/master/rtl-sdr.rules
+cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
+
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
@@ -122,9 +126,9 @@ echo "setting Longitude: $lon"
 echo
 if ! grep -e '--lon' /etc/default/dump1090-fa &>/dev/null; then sed -i -e 's/DECODER_OPTIONS="/DECODER_OPTIONS="--lon -0.38178 /' /etc/default/dump1090-fa; fi
 if ! grep -e '--lat' /etc/default/dump1090-fa &>/dev/null; then sed -i -e 's/DECODER_OPTIONS="/DECODER_OPTIONS="--lat 51.52830 /' /etc/default/dump1090-fa; fi
-sudo sed -i -E -e "s/--lat .?[0-9]*.?[0-9]* /--lat $lat /" /etc/default/dump1090-fa
-sudo sed -i -E -e "s/--lon .?[0-9]*.?[0-9]* /--lon $lon /" /etc/default/dump1090-fa
-sudo systemctl restart dump1090-fa
+sed -i -E -e "s/--lat .?[0-9]*.?[0-9]* /--lat $lat /" /etc/default/dump1090-fa
+sed -i -E -e "s/--lon .?[0-9]*.?[0-9]* /--lon $lon /" /etc/default/dump1090-fa
+systemctl restart dump1090-fa
 EOF
 chmod a+x /usr/local/bin/dump1090-fa-set-location
 
