@@ -29,4 +29,5 @@ fi
 cp pingfail.sh $ipath
 cp pingfail.service /lib/systemd/system
 
-systemctl enable --now pingfail
+systemctl enable pingfail
+systemctl restart pingfail

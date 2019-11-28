@@ -9,7 +9,7 @@ FAIL="no"
 
 while sleep 300
 do
-	if ping $TEST1 -c1 -w5 >/dev/null
+	if ping $TEST1 -c1 -w5 >/dev/null || ping $TEST2 -c1 -w5 >/dev/null
 	then
 		FAIL="no"
 	elif [[ "$FAIL" == yes ]]
