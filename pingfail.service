@@ -1,0 +1,14 @@
+
+[Unit]
+Description=pingfail - reboot when there is no internet
+Documentation=https://github.com/wiedehopf/adsb-scripts/wiki/pingfail
+Wants=network.target
+After=network.target
+
+[Service]
+ExecStart=/bin/bash /usr/local/share/adsb-scripts/pingfail.sh
+Type=simple
+Restart=no
+
+[Install]
+WantedBy=default.target
