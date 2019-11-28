@@ -7,7 +7,7 @@ TEST1="google.com"
 TEST2="akamai.com"
 FAIL="no"
 
-while sleep 180
+while sleep 300
 do
 	if ping $TEST1 -c1 -w5 >/dev/null
 	then
