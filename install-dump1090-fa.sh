@@ -10,7 +10,7 @@ ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
 
 # make sure the rtl-sdr rules are present
-wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/osmocom/rtl-sdr/master/rtl-sdr.rules
+wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
 cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
 
 cd /tmp
