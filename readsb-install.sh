@@ -18,7 +18,7 @@ apt-get install --no-install-recommends --no-install-suggests -y git build-essen
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
     libncurses5-dev lighttpd
 
-if ! git clone --depth 1 -b dev "$repository" "$ipath/git" || ! cd "$ipath/git"
+if ! git clone --depth 1 -b dev "$repository" "$ipath/git" && ! cd "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
@@ -50,8 +50,8 @@ apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 apt-get remove -y dump1090-fa &>/dev/null
 
-rm /etc/lighttpd/conf-enabled/89-dump1090.conf
-rm /etc/lighttpd/conf-enabled/*dump1090-fa*.conf
+rm /etc/lighttpd/conf-enabled/89-dump1090.conf &>/dev/null
+rm /etc/lighttpd/conf-enabled/*dump1090-fa*.conf &>/dev/null
 
 # configure fr24feed to use readsb
 
