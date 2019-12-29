@@ -134,4 +134,4 @@ chmod a+x /usr/local/bin/readsb-set-location
 
 
 echo --------------
-echo "All done! Webinterface available at http://$(ip route | grep -m1 -o -P 'src \K[0-9,.]*')/readsb"
+echo "All done! Webinterface available at http://$(ip route | grep -m1 -o -P 'src \K[0-9,.]*')/radar"
