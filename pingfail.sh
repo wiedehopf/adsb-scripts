@@ -17,7 +17,8 @@ do
 		if ! ping $TEST1 -c5 -w20 >/dev/null && ! ping $TEST2 -c5 -w20 >/dev/null
 		then
 			echo "$(date): Rebooting, could reach neither $TEST1 nor $TEST2" | tee -a /var/log/pingfail
-			reboot
+			sync
+            reboot -f
 		fi
 		FAIL="no"
 	else
