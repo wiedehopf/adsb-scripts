@@ -1,5 +1,14 @@
 #!/bin/bash
-repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.7.2_all.deb"
+if grep -qs stretch /etc/os-release
+then
+    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.0_all.deb"
+elif grep -qs buster /etc/os-release
+then
+    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.0~bpo9+1_all.deb"
+else
+    echo "Only Raspbian Stretch and Buster are supported by this script, exiting!"
+    exit 1
+fi
 
 
 #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
