@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+if ! command -v vcgencmd &>/dev/null
+then
+    echo -------
+    echo "Command vcgencmd not found, can't check for throttling!"
+    echo "Exiting."
+    echo -------
+    exit 1
+fi
+
 #Flag Bits
 UNDERVOLTED=0x1
 CAPPED=0x2
