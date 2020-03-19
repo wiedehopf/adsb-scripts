@@ -10,7 +10,7 @@ then
 	fi
 fi
 
-stop="piaware dump1090-fa dump1090-mutability dump1090 dump978-fa"
+stop="piaware dump1090-fa dump1090-mutability dump1090 dump978-fa readsb"
 
 systemctl stop fr24feed &>/dev/null
 
