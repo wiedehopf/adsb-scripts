@@ -16,9 +16,16 @@ do
 	then
 		if ! ping $TEST1 -c5 -w20 >/dev/null && ! ping $TEST2 -c5 -w20 >/dev/null
 		then
-			echo "$(date): Rebooting, could reach neither $TEST1 nor $TEST2" | tee -a /var/log/pingfail
-			sync
-            reboot -f
+            echo "$(date): Rebooting, could reach neither $TEST1 nor $TEST2" | tee -a /var/log/pingfail
+            mkdir -p /run/systemd/system/reboot.target.d/
+            cat > /run/systemd/system/reboot.target.d/fastreboot.conf <<"EOF"
+[Unit]
+JobTimeoutSec=60
+JobTimeoutAction=reboot-force
+EOF
+            systemctl daemon-reload
+            sync
+            reboot
 		fi
 		FAIL="no"
 	else
