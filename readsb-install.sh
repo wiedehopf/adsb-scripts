@@ -44,7 +44,13 @@ then
     exit 1
 fi
 
-systemctl stop fr24feed
+systemctl stop fr24feed &>/dev/null
+systemctl stop rb-feeder &>/dev/null
+
+if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null && grep -qs -e 'mode=beast' /etc/rbfeeder.ini && grep -qs -e 'external_port=30005' /etc/rbfeeder.ini && grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
+then
+    sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
+fi
 
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
@@ -70,7 +76,8 @@ lighty-enable-mod readsb
 lighty-enable-mod readsb-statcache
 
 systemctl daemon-reload
-systemctl restart fr24feed
+systemctl restart fr24feed &>/dev/null
+systemctl restart rb-feeder &>/dev/null
 systemctl restart readsb
 systemctl restart lighttpd
 
