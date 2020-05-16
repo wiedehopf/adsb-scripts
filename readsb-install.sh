@@ -12,6 +12,7 @@ mkdir -p $ipath
 # make sure the rtl-sdr rules are present
 wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
 cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
+udevadm control --reload-rules
 
 apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \

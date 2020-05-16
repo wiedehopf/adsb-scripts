@@ -21,6 +21,7 @@ mkdir -p $ipath
 # make sure the rtl-sdr rules are present
 wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
 cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
+udevadm control --reload-rules
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
