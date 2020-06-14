@@ -1,6 +1,15 @@
 #!/bin/bash
 repository="https://github.com/Mictronics/readsb.git"
 
+## REFUSE INSTALLATION ON ADSBX IMAGE
+
+if [ -f /boot/adsb-config.txt ]; then
+    echo --------
+    echo "You are using the adsbx image, this setup script would mess up the configuration."
+    echo --------
+    echo "Exiting."
+    exit 1
+fi
 
 #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
 mount -o remount,rw /
