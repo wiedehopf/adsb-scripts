@@ -28,7 +28,8 @@ apt-get install --no-install-recommends --no-install-suggests -y git build-essen
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
     libncurses5-dev lighttpd
 
-if ! git clone --depth 1 -b dev "$repository" "$ipath/git" && ! cd "$ipath/git"
+rm -rf "$ipath"/git
+if ! git clone --depth 1 -b dev "$repository" "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
@@ -37,8 +38,6 @@ fi
 rm -rf "$ipath"/readsb*.deb
 
 cd "$ipath/git"
-git fetch
-git reset --hard origin/dev
 
 sed -i -e 's/, libblade.*//' debian/control
 
