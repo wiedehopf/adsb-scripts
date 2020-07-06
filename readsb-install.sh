@@ -86,7 +86,7 @@ lighty-enable-mod readsb-statcache
 
 systemctl daemon-reload
 systemctl restart fr24feed &>/dev/null
-systemctl restart rb-feeder &>/dev/null
+systemctl restart rbfeeder &>/dev/null
 systemctl restart readsb
 systemctl restart lighttpd
 
