@@ -11,9 +11,11 @@ if [ -f /boot/adsb-config.txt ]; then
     exit 1
 fi
 
-#fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
-mount -o remount,rw /
-sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
+if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
+    #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
+    mount -o remount,rw /
+    sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
+fi
 
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
@@ -29,7 +31,7 @@ apt-get install --no-install-recommends --no-install-suggests -y git build-essen
     libncurses5-dev lighttpd
 
 rm -rf "$ipath"/git
-if ! git clone --depth 1 -b dev "$repository" "$ipath/git"
+if ! git clone --single-branch --depth 1 "$repository" "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
@@ -40,7 +42,9 @@ rm -rf "$ipath"/readsb*.deb
 cd "$ipath/git"
 
 sed -i -e 's/, libblade.*//' debian/control
+sed -i -e 's/test:/test1:/' Makefile
 
+export DEB_BUILD_OPTIONS=noddebs
 if ! dpkg-buildpackage -b --build-profiles=rtlsdr --no-sign
 then
     echo "Something went wrong building the debian package, exiting!"
@@ -56,17 +60,24 @@ fi
 systemctl stop fr24feed &>/dev/null
 systemctl stop rb-feeder &>/dev/null
 
-if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null && grep -qs -e 'mode=beast' /etc/rbfeeder.ini && grep -qs -e 'external_port=30005' /etc/rbfeeder.ini && grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
-then
-    sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
-fi
-
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 apt-get remove -y dump1090-fa &>/dev/null
 
 rm /etc/lighttpd/conf-enabled/89-dump1090.conf &>/dev/null
 rm /etc/lighttpd/conf-enabled/*dump1090-fa*.conf &>/dev/null
+
+# configure rbfeeder to use readsb
+
+if [[ -f /etc/rbfeeder.ini ]]; then
+    if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null &&
+        grep -qs -e 'mode=beast' /etc/rbfeeder.ini &&
+        grep -qs -e 'external_port=30005' /etc/rbfeeder.ini &&
+        grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
+    then
+        sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
+    fi
+fi
 
 # configure fr24feed to use readsb
 
