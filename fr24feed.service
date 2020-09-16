@@ -5,6 +5,7 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
+ExecStartPre=/bin/rm -f /dev/shm/decoder.txt
 ExecStart=/bin/bash -c "/usr/bin/fr24feed | sed -u -e 's/[0-9,-]* [0-9,:]* | //' | grep -F -e imeout -e rror -e info -e main -e onnect -e reader -e '[mlat][i]Stats' --line-buffered | perl -ne 'print if (/mlat..i.Stats/ and not $n++ % 777) or not /mlat..i.Stats/;$|=1' "
 User=fr24
 Group=fr24
