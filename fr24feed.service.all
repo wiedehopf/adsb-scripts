@@ -14,6 +14,9 @@ StandardOutput=syslog
 SyslogIdentifier=fr24feed
 SendSIGHUP=yes
 TimeoutStopSec=5
+RestartSec=5
+StartLimitInterval=1
+StartLimitBurst=100
 
 [Install]
 WantedBy=multi-user.target
