@@ -8,6 +8,10 @@ mkdir -p $ipath
 GIT="$ipath/wiedehopf-readsb-git"
 BRANCH=stale
 
+if [[ "$1x" != "x" ]]; then
+    BRANCH="$1"
+fi
+
 apt update
 apt install --no-install-recommends --no-install-suggests -y \
     git build-essential libusb-1.0-0-dev \
@@ -17,7 +21,7 @@ if ! cd "$GIT" || ! git fetch origin "$BRANCH" || ! git reset --hard FETCH_HEAD
 then
     cd /tmp
     rm -rf "$GIT"
-    if ! git clone --depth 8 --single-branch --branch "$BRANCH" "$repository" "$GIT"
+    if ! git clone --depth 2 --single-branch --branch "$BRANCH" "$repository" "$GIT"
     then
         echo "Unable to git clone the repository"
         exit 1
