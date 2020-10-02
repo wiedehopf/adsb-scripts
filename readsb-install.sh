@@ -1,5 +1,5 @@
 #!/bin/bash
-repository="https://github.com/Mictronics/readsb.git"
+repository="https://github.com/wiedehopf/readsb.git"
 
 ## REFUSE INSTALLATION ON ADSBX IMAGE
 
@@ -17,7 +17,7 @@ if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 fi
 
-ipath=/usr/local/share/adsb-wiki
+ipath=/usr/local/share/adsb-wiki/readsb-install
 mkdir -p $ipath
 
 # make sure the rtl-sdr rules are present
@@ -28,10 +28,10 @@ udevadm control --reload-rules
 apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
-    libncurses5-dev lighttpd
+    libncurses5-dev lighttpd zlib1g-dev zlib1g
 
 rm -rf "$ipath"/git
-if ! git clone --single-branch --depth 1 "$repository" "$ipath/git"
+if ! git clone --branch stale --depth 1 "$repository" "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
@@ -41,7 +41,6 @@ rm -rf "$ipath"/readsb*.deb
 
 cd "$ipath/git"
 
-sed -i -e 's/, libblade.*//' debian/control
 sed -i -e 's/test:/test1:/' Makefile
 
 export DEB_BUILD_OPTIONS=noddebs
@@ -56,6 +55,18 @@ then
     echo "Something went wrong installing the debian package, exiting!"
     exit 1
 fi
+
+cd "$ipath"
+# install readsb webinterface
+wget -O mic-readsb.zip https://github.com/Mictronics/readsb/archive/master.zip
+rm -rf mic-readsb
+unzip -d mic-readsb mic-readsb.zip
+rm -rf /usr/share/readsb/html
+mkdir -p /usr/share/readsb/html
+cp -a mic-readsb/readsb-master/webapp/src/* /usr/share/readsb/html
+
+rm -rf mic-readsb mic-readsb.zip
+
 
 systemctl stop fr24feed &>/dev/null
 systemctl stop rb-feeder &>/dev/null
