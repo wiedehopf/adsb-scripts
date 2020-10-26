@@ -5,7 +5,7 @@ APPS="dump1090-fa readsb"
 rm -rf $ipath
 mkdir -p $ipath
 cd $ipath
-git clone https://github.com/rtlsdrblog/rtl_biast
+git clone --depth 1 https://github.com/rtlsdrblog/rtl_biast
 cd rtl_biast
 pushd .
 
@@ -21,6 +21,7 @@ for APP in $APPS; do
     cat > /etc/systemd/system/$APP.service.d/bias-t.conf << "EOF"
 [Service]
 ExecStartPre=/usr/local/share/adsb-wiki/biastee/rtl_biast/build/src/rtl_biast -b 1
+ExecStopPost=/usr/local/share/adsb-wiki/biastee/rtl_biast/build/src/rtl_biast -b 0
 EOF
 
 done
