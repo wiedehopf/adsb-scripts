@@ -44,7 +44,7 @@ cd "$ipath/git"
 sed -i -e 's/test:/test1:/' Makefile
 
 export DEB_BUILD_OPTIONS=noddebs
-if ! dpkg-buildpackage -b --build-profiles=rtlsdr --no-sign
+if ! dpkg-buildpackage -b -Prtlsdr -ui -uc -us
 then
     echo "Something went wrong building the debian package, exiting!"
     exit 1
