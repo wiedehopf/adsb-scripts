@@ -32,7 +32,7 @@ fi
 
 stats=/run/$APP/stats.json
 
-if ! [[ -f $stats ]]; then echo "stats.json not found, is the decoder running?"; exit 0; fi
+if ! [[ -f $stats ]]; then echo "stats.json not found, is the decoder running?"; exit 1; fi
 
 oldstrong=$(cat $tmp/strong 2>/dev/null)
 oldtotal=$(cat $tmp/total 2>/dev/null)
@@ -41,10 +41,22 @@ if [[ -z $oldstrong ]] || [[ -z $oldtotal ]]; then
 	oldtotal=0
 fi
 
+if ! grep -qs total $stats | grep -qs -e strong_signals $stats; then
+    echo "the decoder doesn't seem to be using an rtl-sdr device, can't help with that."
+    exit 1
+fi
+
 strong=$(grep total $stats | sed 's/.*strong_signals":\([0-9]*\).*remote.*/\1/' | tee $tmp/strong)
 total=$(grep total $stats | sed 's/.*accepted":\[\([0-9]*\).*remote.*/\1/' | tee $tmp/total)
-if [[ -z $strong ]] || [[ -z $total ]]; then echo "unrecognized format: $stats"; exit 0; fi
+if [[ -z $strong ]] || [[ -z $total ]]; then echo "unrecognized format: $stats"; exit 1; fi
 
+start=$(grep total $stats | sed 's/.*start":\([0-9]*\).*/\1/')
+end=$(grep total $stats | sed 's/.*end":\([0-9]*\).*/\1/')
+
+if ! awk "BEGIN{ exit  ($end < $start + 70) }"; then
+    echo "The decoder hasn't been running long enough, wait a bit!"
+    exit 1
+fi
 
 if [[ $oldtotal > $total ]] || [[ $oldstrong > $strong ]] || [[ $oldtotal == $total ]]; then
 	oldstrong=0
@@ -64,6 +76,10 @@ strong=$percent
 
 if [[ $strong == "nan" ]]; then echo "Error, can't automatically adjust gain!"; exit 1; fi
 oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/$APP)
+
+if [[ "$oldgain" == "" ]]; then
+    oldgain=44
+fi
 
 gain_index=28
 for i in "${!ga[@]}"; do
