@@ -1,14 +1,25 @@
 #!/bin/bash
 
+# remove old version:
+rm -f /usr/local/bin/dump1090-fa-autogain
+rm -f /etc/default/dump1090-fa-autogain
+rm -f /etc/cron.d/dump1090-fa-autogain
+
+systemctl disable dump1090-fa-autogain.timer
+systemctl stop dump1090-fa-autogain.timer
+
+rm -f /lib/systemd/system/dump1090-fa-autogain.service
+rm -f /lib/systemd/system/dump1090-fa-autogain.timer
+
 # script to change gain
 
 mkdir -p /usr/local/bin
-cat >/usr/local/bin/dump1090-fa-autogain <<"EOF"
+cat >/usr/local/bin/autogain1090 <<"EOF"
 #!/bin/bash
 low=1.0
 high=5.0
 ga=(0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 -10)
-tmp=/var/tmp/dump1090-fa-autogain
+tmp=/var/tmp/autogain1090
 mkdir -p $tmp
 
 APP=dump1090-fa
@@ -19,7 +30,7 @@ elif [[ -f /run/readsb/stats.json ]]; then
 fi
 
 stats=/run/$APP/stats.json
-source /etc/default/dump1090-fa-autogain
+source /etc/default/autogain1090
 
 if ! [[ -f $stats ]]; then echo "$stats not found, is the decoder running?"; exit 0; fi
 
@@ -92,11 +103,11 @@ echo 0 > $tmp/total
 
 echo "$action gain to $gain (${strong}% messages >-3dB)"
 EOF
-chmod a+x /usr/local/bin/dump1090-fa-autogain
+chmod a+x /usr/local/bin/autogain1090
 
-config_file=/etc/default/dump1090-fa-autogain
+config_file=/etc/default/autogain1090
 if ! [ -f $config_file ]; then
-	cat >/etc/default/dump1090-fa-autogain <<"EOF"
+	cat >/etc/default/autogain1090 <<"EOF"
 #!/bin/bash
 
 low=1.0
@@ -106,17 +117,17 @@ ga=(0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.
 EOF
 fi
 
-rm -f /etc/cron.d/dump1090-fa-autogain
+rm -f /etc/cron.d/autogain1090
 
-cat >/lib/systemd/system/dump1090-fa-autogain.service <<"EOF"
+cat >/lib/systemd/system/autogain1090.service <<"EOF"
 [Unit]
 Description=autogain for dump1090-fa
 
 [Service]
-ExecStart=/usr/local/bin/dump1090-fa-autogain
+ExecStart=/usr/local/bin/autogain1090
 EOF
 
-cat >/lib/systemd/system/dump1090-fa-autogain.timer <<"EOF"
+cat >/lib/systemd/system/autogain1090.timer <<"EOF"
 [Unit]
 Description=Nightly automic gain adjustment for dump1090-fa
 
@@ -129,13 +140,13 @@ WantedBy=timers.target
 EOF
 
 if grep jessie /etc/os-release >/dev/null; then
-	sed -i -e '/Randomized/d' /lib/systemd/system/dump1090-fa-autogain.timer
+	sed -i -e '/Randomized/d' /lib/systemd/system/autogain1090.timer
 fi
 
 
 systemctl daemon-reload
-systemctl enable dump1090-fa-autogain.timer
-systemctl restart dump1090-fa-autogain.timer
+systemctl enable autogain1090.timer
+systemctl restart autogain1090.timer
 
 
 echo --------------
