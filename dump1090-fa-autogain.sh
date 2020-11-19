@@ -10,10 +10,18 @@ high=5.0
 ga=(0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 -10)
 tmp=/var/tmp/dump1090-fa-autogain
 mkdir -p $tmp
-stats=/run/dump1090-fa/stats.json
+
+APP=dump1090-fa
+if [[ -f /run/dump1090-fa/stats.json ]]; then
+    APP=dump1090-fa
+elif [[ -f /run/readsb/stats.json ]]; then
+    APP=readsb
+fi
+
+stats=/run/$APP/stats.json
 source /etc/default/dump1090-fa-autogain
 
-if ! [[ -f $stats ]]; then echo "$stats not found, is dump1090-fa running?"; exit 0; fi
+if ! [[ -f $stats ]]; then echo "$stats not found, is the decoder running?"; exit 0; fi
 
 oldstrong=$(cat $tmp/strong 2>/dev/null)
 oldtotal=$(cat $tmp/total 2>/dev/null)
@@ -40,7 +48,7 @@ percent=$(awk "BEGIN {printf \"%.3f\", $strong * 100 / $total}")
 strong=$percent
 
 if [[ $strong == "nan" ]]; then echo "Error, can't automatically adjust gain!"; exit 1; fi
-oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/dump1090-fa)
+oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/$APP)
 
 gain_index=28
 for i in "${!ga[@]}"; do
@@ -51,6 +59,9 @@ if ! awk "BEGIN{ exit ($strong > $low) }" && ! awk "BEGIN{ exit ($strong < $high
 	echo "No gain change needed, percentage of messages >-3dB is in nominal range. (${strong}%)"
 	exit 0
 fi
+
+if ! awk "BEGIN{ exit ($strong < $low) }" && [[ $gain_index == 28 ]]
+then echo "Gain already at maximum! (${strong}% messages >-3dB)"; exit 0; fi
 
 if ! awk "BEGIN{ exit ($strong < $low) }"
 then gain_index=$(($gain_index+1)); action=Increasing; fi
@@ -70,10 +81,10 @@ then
 	piaware-config rtlsdr-gain $gain
 fi
 
-if ! grep gain /etc/default/dump1090-fa &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/dump1090-fa;fi
-sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain $gain /" /etc/default/dump1090-fa
+if ! grep gain /etc/default/$APP &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
+sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain $gain /" /etc/default/$APP
 
-systemctl restart dump1090-fa
+systemctl restart $APP
 
 #reset numbers
 echo 0 > $tmp/strong
