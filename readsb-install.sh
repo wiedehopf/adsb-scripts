@@ -41,8 +41,6 @@ rm -rf "$ipath"/readsb*.deb
 
 cd "$ipath/git"
 
-sed -i -e 's/test:/test1:/' Makefile
-
 export DEB_BUILD_OPTIONS=noddebs
 if ! dpkg-buildpackage -b -Prtlsdr -ui -uc -us
 then
