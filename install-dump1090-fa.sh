@@ -79,6 +79,10 @@ sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-f
 lighty-enable-mod dump1090-fa
 lighty-enable-mod dump1090-fa-statcache
 
+if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
+    rm -f /etc/lighttpd/conf-enabled/88-dump1090-fa-statcache.conf
+fi
+
 systemctl daemon-reload
 systemctl restart fr24feed &>/dev/null
 systemctl restart rb-feeder &>/dev/null

@@ -103,6 +103,10 @@ fi
 lighty-enable-mod readsb
 lighty-enable-mod readsb-statcache
 
+if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
+    rm -f /etc/lighttpd/conf-enabled/88-readsb-statcache.conf
+fi
+
 systemctl daemon-reload
 systemctl restart fr24feed &>/dev/null
 systemctl restart rbfeeder &>/dev/null
