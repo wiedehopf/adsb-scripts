@@ -1,4 +1,5 @@
 #!/bin/bash
+renice 10 $$
 if grep -qs stretch /etc/os-release
 then
     repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1~bpo9+1_all.deb"

@@ -1,4 +1,5 @@
 #!/bin/bash
+renice 10 $$
 set -e
 ipath=/usr/local/share/adsb-wiki/biastee
 APPS="dump1090-fa readsb"

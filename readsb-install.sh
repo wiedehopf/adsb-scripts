@@ -1,6 +1,8 @@
 #!/bin/bash
 repository="https://github.com/wiedehopf/readsb.git"
 
+renice 10 $$
+
 ## REFUSE INSTALLATION ON ADSBX IMAGE
 
 if [ -f /boot/adsb-config.txt ]; then

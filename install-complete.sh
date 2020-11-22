@@ -1,4 +1,5 @@
 #!/bin/bash
+renice 10 $$
 clear
 echo "--------------"
 echo "Bundle install for dump1090-fa by wiedehopf"

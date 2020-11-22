@@ -1,4 +1,5 @@
 #!/bin/bash
+renice 10 $$
 
 set -e
 repository="https://github.com/wiedehopf/readsb.git"
