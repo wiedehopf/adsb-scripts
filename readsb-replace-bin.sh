@@ -2,7 +2,7 @@
 renice 10 $$
 
 set -e
-repository="https://github.com/Mictronics/readsb.git"
+repository="https://github.com/wiedehopf/readsb.git"
 
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
@@ -23,12 +23,15 @@ git fetch
 git reset --hard origin/dev
 
 make clean
-# remove the # in the next line to compile with biastee (might not work depending on librtlsdr version)
-make -j3 RTLSDR=yes HISTORY=yes # HAVE_BIASTEE=yes
+make -j2 AIRCRAFT_HASH_BITS=12 RTLSDR=yes OPTIMIZE="-march=native"
+
 
 rm -f /usr/bin/readsb /usr/bin/viewadsb
 cp readsb viewadsb /usr/bin
 
+rm -f /usr/bin/adsbxfeeder
+cp readsb /usr/bin/adsbxfeeder
+
 echo "Restarting readsb!"
 systemctl restart readsb
-echo "All done!"
+echo "All done! Reboot recommended."
