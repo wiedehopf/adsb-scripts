@@ -1,7 +1,7 @@
 OPTIONS0= -v -o 4 -j feed.acars.io:5550
 
 # username for acars.io:
-OPTIONS1= -i WH-EDQG
+OPTIONS1= -i UNKNOWN
 
 # gain for rtl-sdr, 480 is 48.0
 OPTIONS2= -g 480
