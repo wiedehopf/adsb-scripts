@@ -1,0 +1,7 @@
+OPTIONS0= -v -o 4 -j feed.acars.io:5550
+OPTIONS1= -i WH-EDQG # <----- username for acars.io
+OPTIONS2= -g 480 # <---- gain for rtl-sdr, 480 is 48.0
+OPTIONS3= -l /var/tmp/acarsdec # delete this line if you don't want the messages to be written to disk
+OPTIONS4= -r 0 # <--- rtl-sdr device id or serial
+OPTIONS5= 130.025 130.450 131.125 131.525 131.550 131.725 131.825
+
