@@ -6,8 +6,8 @@ OPTIONS1= -i WH-EDQG
 # gain for rtl-sdr, 480 is 48.0
 OPTIONS2= -g 480
 
-# delete the following line if you don't want the messages to be written to disk
-OPTIONS3= -l /var/tmp/acarsdec
+# to have the messages written to disk instead of the journal, uncomment the following line:
+# OPTIONS3= -l /var/tmp/acarsdec
 
 # rtl-sdr device id or serial:
 OPTIONS4= -r 0
