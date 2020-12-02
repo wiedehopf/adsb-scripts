@@ -34,7 +34,12 @@ cd build
 cmake .. -Drtl=ON
 make -j2
 
-cp acarsdec /usr/local/bin
+BIN=/usr/local/bin/acarsdec
+rm -f $BIN
+cp -T acarsdec $BIN
 
 systemctl enable acarsdec
 systemctl restart acarsdec
+
+cd
+rm -rf "$GIT"
