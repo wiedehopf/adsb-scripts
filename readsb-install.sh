@@ -30,7 +30,7 @@ udevadm control --reload-rules
 apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
-    libncurses5-dev lighttpd zlib1g-dev zlib1g
+    libncurses5-dev lighttpd zlib1g-dev zlib1g unzip
 
 rm -rf "$ipath"/git
 if ! git clone --branch stale --depth 1 "$repository" "$ipath/git"
