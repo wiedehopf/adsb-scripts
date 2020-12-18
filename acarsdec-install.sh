@@ -21,6 +21,8 @@ fi
 cp acarsdec.service /lib/systemd/system
 cp acarsdec.default /etc/default/acarsdec
 
+sed -i -e "s/UNKNOWN/$RANDOM$RANDOM/" /etc/default/acarsdec
+
 adduser --system --home $ipath --no-create-home --quiet acarsdec
 adduser acarsdec plugdev
 
