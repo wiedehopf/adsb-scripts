@@ -7,16 +7,18 @@ repository="https://github.com/wiedehopf/readsb.git"
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
 GIT="$ipath/wiedehopf-readsb-git"
-BRANCH=stale
+BRANCH=dev
 
 if [[ "$1x" != "x" ]]; then
     BRANCH="$1"
 fi
 
-apt update
-apt install --no-install-recommends --no-install-suggests -y \
-    git build-essential libusb-1.0-0-dev \
-    librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g
+if ! [[ -f "$GIT/readsb" ]]; then
+    apt update
+    apt install --no-install-recommends --no-install-suggests -y \
+        git build-essential libusb-1.0-0-dev \
+        librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g
+fi
 
 if ! cd "$GIT" || ! git fetch origin "$BRANCH" || ! git reset --hard FETCH_HEAD
 then
