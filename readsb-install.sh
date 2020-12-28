@@ -22,10 +22,12 @@ fi
 ipath=/usr/local/share/adsb-wiki/readsb-install
 mkdir -p $ipath
 
-# make sure the rtl-sdr rules are present
-wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
-cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
-udevadm control --reload-rules
+if grep -E 'jessie' /etc/os-release -qs; then
+    # make sure the rtl-sdr rules are present on jessie
+    wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
+    cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
+    udevadm control --reload-rules
+fi
 
 apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \

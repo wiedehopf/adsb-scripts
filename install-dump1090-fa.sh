@@ -12,17 +12,21 @@ else
 fi
 
 
-#fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
-mount -o remount,rw /
-sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
+if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
+    #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
+    mount -o remount,rw /
+    sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
+fi
 
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
 
-# make sure the rtl-sdr rules are present
-wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
-cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
-udevadm control --reload-rules
+if grep -E 'jessie' /etc/os-release -qs; then
+    # make sure the rtl-sdr rules are present on jessie
+    wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
+    cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
+    udevadm control --reload-rules
+fi
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
@@ -31,19 +35,8 @@ apt-get update
 apt-get install --no-install-recommends --no-install-suggests --reinstall -y dump1090-fa
 
 if ! /usr/bin/dump1090-fa --help >/dev/null; then
-	sed -i -e '0,/nameserver/{s/nameserver.*/nameserver 8.8.8.8/}' /etc/resolv.conf
-	sysctl -w net.ipv6.conf.all.disable_ipv6=0
-	sysctl -w net.ipv6.conf.default.disable_ipv6=0
-
-	wget --timeout=30 -q -O repository.deb $repository
-	dpkg -i repository.deb
-	apt-get update
-	apt-get install --no-install-recommends --no-install-suggests --reinstall -y dump1090-fa
-
-	if ! /usr/bin/dump1090-fa --help >/dev/null; then
-		echo "Couldn't install dump1090-fa! (Maybe try again?)"
-		exit 1
-	fi
+    echo "Couldn't install dump1090-fa! (Maybe try again?)"
+    exit 1
 fi
 
 systemctl stop fr24feed &>/dev/null
