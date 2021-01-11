@@ -146,8 +146,8 @@ then
 	piaware-config rtlsdr-gain $gain
 fi
 
-if ! grep gain /etc/default/$APP &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
-sed -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
+if ! grep gain /etc/default/$APP &>/dev/null; then sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
+sed --follow-symlinks -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
 
 systemctl restart $APP
 
@@ -194,7 +194,7 @@ WantedBy=timers.target
 EOF
 
 if grep jessie /etc/os-release >/dev/null; then
-	sed -i -e '/Randomized/d' /lib/systemd/system/autogain1090.timer
+	sed --follow-symlinks -i -e '/Randomized/d' /lib/systemd/system/autogain1090.timer
 fi
 
 
