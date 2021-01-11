@@ -11,6 +11,16 @@ systemctl stop dump1090-fa-autogain.timer &>/dev/null
 rm -f /lib/systemd/system/dump1090-fa-autogain.service
 rm -f /lib/systemd/system/dump1090-fa-autogain.timer
 
+if ! command -v jq &> /dev/null; then
+    apt update
+    apt install -y --no-install-suggests --no-install-recommends jq
+    hash -r
+    if ! command -v jq &> /dev/null; then
+        echo "ERROR: couldn't install jq! FATAL!"
+        exit 1
+    fi
+fi
+
 # script to change gain
 
 mkdir -p /usr/local/bin
@@ -46,15 +56,19 @@ if ! grep -qs total $stats | grep -qs -e strong_signals $stats; then
     exit 1
 fi
 
-strong=$(grep total $stats | sed 's/.*strong_signals":\([0-9]*\).*remote.*/\1/' | tee $tmp/strong)
-total=$(grep total $stats | sed 's/.*accepted":\[\([0-9]*\).*remote.*/\1/' | tee $tmp/total)
-if [[ -z $strong ]] || [[ -z $total ]]; then echo "unrecognized format: $stats"; exit 1; fi
-
-start=$(grep total $stats | sed 's/.*start":\([0-9]*\).*/\1/')
-end=$(grep total $stats | sed 's/.*end":\([0-9]*\).*/\1/')
+start=$(jq '.total.start' < $stats)
+end=$(jq '.total.end' < $stats)
 
 if ! awk "BEGIN{ exit  ($end < $start + 70) }"; then
     echo "The decoder hasn't been running long enough, wait a bit!"
+    exit 1
+fi
+
+strong=$(jq '.total.local.strong_signals' < $stats | tee $tmp/strong)
+total=$(jq '.total.local.accepted | add' < $stats | tee $tmp/total)
+
+if [[ -z $strong ]] || [[ -z $total ]]; then
+    echo "unrecognized format: $stats"
     exit 1
 fi
 
