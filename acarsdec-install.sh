@@ -23,8 +23,14 @@ cp acarsdec.default /etc/default/acarsdec
 
 sed -i -e "s/UNKNOWN/$RANDOM$RANDOM/" /etc/default/acarsdec
 
-# blacklist kernel driver as on some systems acarsdec can't detach the kernel driver
-echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+# blacklist kernel driver as on ancient systems
+if grep -E 'wheezy|jessie' /etc/os-release -qs; then
+    echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+    rmmod rtl2832 &>/dev/null
+    rmmod dvb_usb_rtl28xxu &>/dev/null
+    rmmod rtl8xxxu &>/dev/null
+    rmmod rtl8192cu &>/dev/null
+fi
 
 adduser --system --home $ipath --no-create-home --quiet acarsdec
 adduser acarsdec plugdev

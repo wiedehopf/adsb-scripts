@@ -19,6 +19,15 @@ if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 fi
 
+# blacklist kernel driver as on ancient systems
+if grep -E 'wheezy|jessie' /etc/os-release -qs; then
+    echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+    rmmod rtl2832 &>/dev/null
+    rmmod dvb_usb_rtl28xxu &>/dev/null
+    rmmod rtl8xxxu &>/dev/null
+    rmmod rtl8192cu &>/dev/null
+fi
+
 ipath=/usr/local/share/adsb-wiki/readsb-install
 mkdir -p $ipath
 
