@@ -61,23 +61,15 @@ then
     exit 1
 fi
 
+echo "Installing the Package"
 if ! dpkg -i ../readsb_*.deb
 then
     echo "Something went wrong installing the debian package, exiting!"
     exit 1
 fi
+echo "Package installed!"
 
-cd "$ipath"
-# install readsb webinterface
-wget -O mic-readsb.zip https://github.com/Mictronics/readsb/archive/master.zip
-rm -rf mic-readsb
-unzip -d mic-readsb mic-readsb.zip
-rm -rf /usr/share/readsb/html
-mkdir -p /usr/share/readsb/html
-cp -a mic-readsb/readsb-master/webapp/src/* /usr/share/readsb/html
-
-rm -rf mic-readsb mic-readsb.zip
-
+cp -n debian/lighttpd/* /etc/lighttpd/conf-available
 
 systemctl stop fr24feed &>/dev/null
 systemctl stop rb-feeder &>/dev/null
@@ -85,9 +77,6 @@ systemctl stop rb-feeder &>/dev/null
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 apt-get remove -y dump1090-fa &>/dev/null
-
-rm /etc/lighttpd/conf-enabled/89-dump1090.conf &>/dev/null
-rm /etc/lighttpd/conf-enabled/*dump1090-fa*.conf &>/dev/null
 
 # configure rbfeeder to use readsb
 
@@ -99,6 +88,7 @@ if [[ -f /etc/rbfeeder.ini ]]; then
     then
         sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
     fi
+    systemctl restart rbfeeder &>/dev/null
 fi
 
 # configure fr24feed to use readsb
@@ -109,20 +99,15 @@ then
 	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki
 	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
 	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
+    systemctl restart fr24feed &>/dev/null
 fi
-
-lighty-enable-mod readsb
-lighty-enable-mod readsb-statcache
 
 if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
     rm -f /etc/lighttpd/conf-enabled/88-readsb-statcache.conf
 fi
 
-systemctl daemon-reload
-systemctl restart fr24feed &>/dev/null
-systemctl restart rbfeeder &>/dev/null
+systemctl enable readsb
 systemctl restart readsb
-systemctl restart lighttpd
 
 # script to change gain
 
@@ -184,4 +169,23 @@ chmod a+x /usr/local/bin/readsb-set-location
 
 
 echo --------------
-echo "All done! Webinterface available at http://$(ip route | grep -m1 -o -P 'src \K[0-9,.]*')/radar"
+cd "$ipath"
+
+wget -O tar1090-install.sh https://raw.githubusercontent.com/wiedehopf/tar1090/master/install.sh
+bash tar1090-install.sh /run/readsb
+
+if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
+    echo --------------
+    echo --------------
+    journalctl -u readsb | tail -n30
+    echo --------------
+    echo --------------
+    echo "ERROR: readsb service didn't start, if inquiring about the issue please post the above 30 lines of log!"
+    echo "       common issues: SDR not plugged in."
+    echo "       the webinterface will show an error until readsb is running!"
+    echo --------------
+fi
+
+echo --------------
+echo "This used to install a no longer maintained readsb interface, it now installs tar1090 as a webinterface instead."
+echo "All done! Webinterface available at http://$(ip route | grep -m1 -o -P 'src \K[0-9,.]*')/tar1090"
