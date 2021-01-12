@@ -29,7 +29,7 @@ done
 
 systemctl daemon-reload
 for APP in $APPS; do
-    if systemctl show readsb 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
+    if systemctl show $APP 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
         systemctl restart $APP || true
     fi
 done
