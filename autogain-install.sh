@@ -1,4 +1,5 @@
 #!/bin/bash
+cd /tmp
 
 # remove old version:
 rm -f /usr/local/bin/dump1090-fa-autogain
@@ -89,7 +90,12 @@ fi
 strong=$percent
 
 if [[ $strong == "nan" ]]; then echo "Error, can't automatically adjust gain!"; exit 1; fi
-oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/$APP)
+
+if [ -f /boot/adsb-config.txt ]; then
+    oldgain=$(grep -P -e 'GAIN=\K[0-9-.]*' -o /boot/adsb-config.txt)
+else
+    oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/$APP)
+fi
 
 if [[ "$oldgain" == "" ]]; then
     oldgain=44
@@ -141,13 +147,16 @@ gain="${ga[$gain_index]}"
 
 if [[ $gain == "" ]]; then echo "Gain already at maximum! (${strong}% messages >-3dB)"; exit 0; fi
 
-if [ -f /boot/piaware-config.txt ]
-then
+if [ -f /boot/piaware-config.txt ]; then
 	piaware-config rtlsdr-gain $gain
 fi
 
-if ! grep gain /etc/default/$APP &>/dev/null; then sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
-sed --follow-symlinks -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
+if [ -f /boot/adsb-config.txt ]; then
+    sed --follow-symlinks -i -E -e "s/^GAIN.*/GAIN=$gain/" /boot/adsb-config.txt
+else
+    if ! grep gain /etc/default/$APP &>/dev/null; then sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
+    sed --follow-symlinks -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
+fi
 
 systemctl restart $APP
 
