@@ -37,7 +37,7 @@ adduser acarsdec plugdev
 
 GIT=/tmp/acarsdec-build
 rm -rf $GIT
-git clone --depth 1 https://github.com/TLeconte/acarsdec.git $GIT
+git clone --depth 1 https://github.com/airframesio/acarsdec.git $GIT
 cd $GIT
 
 mkdir build
