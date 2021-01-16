@@ -3,7 +3,7 @@
 set -e
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
-stuff="git libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
+stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
 
 apt install -y $stuff || apt update && apt install -y $stuff || true
 
