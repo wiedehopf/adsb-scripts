@@ -1,23 +1,36 @@
 #!/bin/bash
-
 set -e
+cd /tmp
+
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
 stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
+branch="master"
+
+if [[ -n $1 ]]; then
+    branch="$1"
+fi
 
 apt install -y $stuff || apt update && apt install -y $stuff || true
 
 mkdir -p $ipath
-if git clone --depth 1 $repo $ipath/git 2>/dev/null || cd $ipath/git
-then
-	cd $ipath/git
-	git checkout -f master
-	git fetch
-	git reset --hard origin/master
-else
-	echo "Download failed"
-	exit 1
-fi
+
+function gitUpdate() {
+    _REPO="$1"
+    _DIR="$2"
+    _BRANCH="$3"
+    { cd "$_DIR" &>/dev/null && git fetch --depth 1 origin "$_BRANCH" && git reset --hard origin/"$_BRANCH"; } ||
+    { cd /tmp && rm -rf "$_DIR" && git clone --depth 1 --branch "$_BRANCH" "$_REPO" "$_DIR"; }
+
+    if ! cd "$_DIR" || ! git rev-parse
+    then
+        echo "Unable to download files, exiting! (Maybe try again?)"
+        exit 1
+    fi
+}
+
+gitUpdate "$repo" "$ipath/git" "$branch"
+
 cp acarsdec.service /lib/systemd/system
 cp acarsdec.default /etc/default/acarsdec
 
