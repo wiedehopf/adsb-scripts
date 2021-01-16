@@ -5,7 +5,7 @@ cd /tmp
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
 stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
-branch="master"
+branch="testing"
 
 if [[ -n $1 ]]; then
     branch="$1"
@@ -29,10 +29,11 @@ function gitUpdate() {
     fi
 }
 
-gitUpdate "$repo" "$ipath/git" "$branch"
+# get adsb-scripts repo
+gitUpdate "$repo" "$ipath/git" master
 
 cp acarsdec.service /lib/systemd/system
-cp acarsdec.default /etc/default/acarsdec
+cp -n acarsdec.default /etc/default/acarsdec
 
 sed -i -e "s/UNKNOWN/$RANDOM$RANDOM/" /etc/default/acarsdec
 
@@ -48,11 +49,10 @@ fi
 adduser --system --home $ipath --no-create-home --quiet acarsdec
 adduser acarsdec plugdev
 
-GIT=/tmp/acarsdec-build
-rm -rf $GIT
-git clone --depth 1 https://github.com/airframesio/acarsdec.git $GIT
-cd $GIT
+GIT="$ipath/acarsdec-git"
+gitUpdate https://github.com/airframesio/acarsdec.git "$GIT" "$branch"
 
+rm -rf build
 mkdir build
 cd build
 cmake .. -Drtl=ON
@@ -64,6 +64,3 @@ cp -T acarsdec $BIN
 
 systemctl enable acarsdec
 systemctl restart acarsdec
-
-cd
-rm -rf "$GIT"
