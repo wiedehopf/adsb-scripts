@@ -13,6 +13,14 @@ if [ -f /boot/adsb-config.txt ]; then
     exit 1
 fi
 
+if [ -f /boot/piaware-config.txt ]; then
+    echo --------
+    echo "You are using the piaware image, this setup script would mess up the configuration."
+    echo --------
+    echo "Exiting."
+    exit 1
+fi
+
 if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
     mount -o remount,rw /
