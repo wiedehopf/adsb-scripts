@@ -85,6 +85,7 @@ systemctl stop rb-feeder &>/dev/null
 apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 apt-get remove -y dump1090-fa &>/dev/null
+rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 # configure rbfeeder to use readsb
 

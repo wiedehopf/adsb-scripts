@@ -59,7 +59,7 @@ apt-get remove -y dump1090-mutability &>/dev/null
 apt-get remove -y dump1090 &>/dev/null
 apt-get remove -y readsb &>/dev/null
 
-mv /etc/lighttpd/conf-enabled/89-dump1090.conf $ipath
+rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 rm /etc/lighttpd/conf-enabled/*readsb*.conf &>/dev/null
 
 # configure fr24feed to use dump1090-fa
