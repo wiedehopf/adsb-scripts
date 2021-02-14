@@ -1,4 +1,13 @@
 #!/bin/bash
+## REFUSE INSTALLATION ON ADSBX IMAGE
+
+if [ -f /boot/adsb-config.txt ]; then
+    echo --------
+    echo "You are using the adsbx image, this setup script would mess up the configuration."
+    echo --------
+    echo "Exiting."
+    exit 1
+fi
 renice 10 $$
 if grep -qs stretch /etc/os-release
 then
