@@ -192,6 +192,8 @@ if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
     echo "ERROR: readsb service didn't start, if inquiring about the issue please post the above 30 lines of log!"
     echo "       common issues: SDR not plugged in."
     echo "       the webinterface will show an error until readsb is running!"
+    echo "       Try if a reboot solves the issue. To check if readsb is running use:"
+    echo "           sudo systemctl status readsb"
     echo --------------
 fi
 
