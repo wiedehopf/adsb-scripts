@@ -14,7 +14,7 @@ then
     repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1~bpo9+1_all.deb"
 elif grep -qs buster /etc/os-release
 then
-    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1_all.deb"
+    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_5.0_all.deb"
 else
     echo "Only Raspbian Stretch and Buster are supported by this script, exiting!"
     exit 1
@@ -88,6 +88,8 @@ sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-f
 
 lighty-enable-mod dump1090-fa
 lighty-enable-mod dump1090-fa-statcache
+
+mv -f /etc/lighttpd/conf-available/89-dump1090-fa.conf.dpkg-dist /etc/lighttpd/conf-available/89-dump1090-fa.conf &>/dev/null
 
 if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
     rm -f /etc/lighttpd/conf-enabled/88-dump1090-fa-statcache.conf
