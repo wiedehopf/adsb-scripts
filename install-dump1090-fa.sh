@@ -1,5 +1,8 @@
 #!/bin/bash
-## REFUSE INSTALLATION ON ADSBX IMAGE
+
+set -e
+trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
+renice 10 $$
 
 if [ -f /boot/adsb-config.txt ]; then
     echo --------
@@ -8,7 +11,7 @@ if [ -f /boot/adsb-config.txt ]; then
     echo "Exiting."
     exit 1
 fi
-renice 10 $$
+
 if grep -qs stretch /etc/os-release
 then
     repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1~bpo9+1_all.deb"
@@ -29,10 +32,12 @@ fi
 # blacklist kernel driver as on ancient systems
 if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+    set +e
     rmmod rtl2832 &>/dev/null
     rmmod dvb_usb_rtl28xxu &>/dev/null
     rmmod rtl8xxxu &>/dev/null
     rmmod rtl8192cu &>/dev/null
+    set -e
 fi
 
 ipath=/usr/local/share/adsb-wiki
@@ -40,15 +45,17 @@ mkdir -p $ipath
 
 if grep -E 'jessie' /etc/os-release -qs; then
     # make sure the rtl-sdr rules are present on jessie
+    set +e
     wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
     cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
     udevadm control --reload-rules
+    set -e
 fi
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository
 dpkg -i repository.deb
-apt-get update
+apt-get update || true
 apt-get install --no-install-recommends --no-install-suggests --reinstall -y dump1090-fa
 
 if ! /usr/bin/dump1090-fa --help >/dev/null; then
@@ -56,20 +63,22 @@ if ! /usr/bin/dump1090-fa --help >/dev/null; then
     exit 1
 fi
 
-systemctl stop fr24feed &>/dev/null
-systemctl stop rb-feeder &>/dev/null
+systemctl stop fr24feed &>/dev/null || true
+systemctl stop rb-feeder &>/dev/null || true
 
 if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null && grep -qs -e 'mode=beast' /etc/rbfeeder.ini && grep -qs -e 'external_port=30005' /etc/rbfeeder.ini && grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
 then
-    sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
+    sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini || true
 fi
 
-apt-get remove -y dump1090-mutability &>/dev/null
-apt-get remove -y dump1090 &>/dev/null
-apt-get remove -y readsb &>/dev/null
+if grep -qs -e '--device 0' /etc/default/readsb && { ! [[ -f /etc/default/dump1090-fa ]] || grep -qs -e '--device 0' /etc/default/dump1090-fa; }; then
+    systemctl disable --now readsb &>/dev/null || true
+fi
+systemctl disable --now dump1090-mutability &>/dev/null || true
+systemctl disable --now dump1090 &>/dev/null || true
 
 rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
-rm /etc/lighttpd/conf-enabled/*readsb*.conf &>/dev/null
+rm -f /etc/lighttpd/conf-enabled/*readsb*.conf &>/dev/null
 
 # configure fr24feed to use dump1090-fa
 
@@ -84,22 +93,21 @@ else
 	echo "After installing/configuring fr24feed, rerun this script to change the configuration for use of dump1090-fa"
 fi
 
-sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-fa
+sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-fa || true
 
-lighty-enable-mod dump1090-fa
-lighty-enable-mod dump1090-fa-statcache
+lighty-enable-mod dump1090-fa || true
+lighty-enable-mod dump1090-fa-statcache || true
 
-mv -f /etc/lighttpd/conf-available/89-dump1090-fa.conf.dpkg-dist /etc/lighttpd/conf-available/89-dump1090-fa.conf &>/dev/null
+mv -f /etc/lighttpd/conf-available/89-dump1090-fa.conf.dpkg-dist /etc/lighttpd/conf-available/89-dump1090-fa.conf &>/dev/null || true
 
 if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
     rm -f /etc/lighttpd/conf-enabled/88-dump1090-fa-statcache.conf
 fi
 
 systemctl daemon-reload
-systemctl restart fr24feed &>/dev/null
-systemctl restart rb-feeder &>/dev/null
-systemctl restart dump1090-fa
-systemctl restart lighttpd
+systemctl restart fr24feed &>/dev/null || true
+systemctl restart rb-feeder &>/dev/null || true
+systemctl restart lighttpd || true
 
 # script to change gain
 
@@ -169,6 +177,8 @@ EOF
 chmod a+x /usr/local/bin/dump1090-fa-set-location
 
 
+echo --------------
+systemctl restart dump1090-fa
 echo --------------
 echo "All done!"
 

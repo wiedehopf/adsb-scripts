@@ -1,9 +1,8 @@
 #!/bin/bash
-repository="https://github.com/wiedehopf/readsb.git"
 
+set -e
+trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
-
-## REFUSE INSTALLATION ON ADSBX IMAGE
 
 if [ -f /boot/adsb-config.txt ]; then
     echo --------
@@ -20,6 +19,8 @@ if [ -f /boot/piaware-config.txt ]; then
     echo "Exiting."
     exit 1
 fi
+
+repository="https://github.com/wiedehopf/readsb.git"
 
 if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
@@ -46,7 +47,7 @@ if grep -E 'jessie' /etc/os-release -qs; then
     udevadm control --reload-rules
 fi
 
-apt-get update
+apt-get update || true
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
     libncurses5-dev lighttpd zlib1g-dev zlib1g unzip
@@ -77,14 +78,17 @@ then
 fi
 echo "Package installed!"
 
-cp -n debian/lighttpd/* /etc/lighttpd/conf-available
+cp -n debian/lighttpd/* /etc/lighttpd/conf-available 
 
-systemctl stop fr24feed &>/dev/null
-systemctl stop rb-feeder &>/dev/null
+systemctl stop fr24feed &>/dev/null || true
+systemctl stop rb-feeder &>/dev/null || true
 
-apt-get remove -y dump1090-mutability &>/dev/null
-apt-get remove -y dump1090 &>/dev/null
-apt-get remove -y dump1090-fa &>/dev/null
+if grep -qs -e '--device 0' /etc/default/dump1090-fa && { ! [[ -f /etc/default/readsb ]] || grep -qs -e '--device 0' /etc/default/readsb; }; then
+    systemctl disable --now dump1090-fa &>/dev/null || true
+fi
+systemctl disable --now dump1090-mutability &>/dev/null || true
+systemctl disable --now dump1090 &>/dev/null || true
+
 rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 # configure rbfeeder to use readsb
@@ -97,18 +101,18 @@ if [[ -f /etc/rbfeeder.ini ]]; then
     then
         sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
     fi
-    systemctl restart rbfeeder &>/dev/null
+    systemctl restart rbfeeder &>/dev/null || true
 fi
 
 # configure fr24feed to use readsb
 
 if [ -f /etc/fr24feed.ini ]
 then
-	chmod a+rw /etc/fr24feed.ini
-	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki
+	chmod a+rw /etc/fr24feed.ini || true
+	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
 	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
-	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
-    systemctl restart fr24feed &>/dev/null
+	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini || true
+    systemctl restart fr24feed &>/dev/null || true
 fi
 
 if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
@@ -116,7 +120,7 @@ if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-eng
 fi
 
 systemctl enable readsb
-systemctl restart readsb
+systemctl restart readsb || true
 
 # script to change gain
 
