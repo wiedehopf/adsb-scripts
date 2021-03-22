@@ -94,13 +94,15 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 # configure rbfeeder to use readsb
 
 if [[ -f /etc/rbfeeder.ini ]]; then
-    if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null &&
-        grep -qs -e 'mode=beast' /etc/rbfeeder.ini &&
-        grep -qs -e 'external_port=30005' /etc/rbfeeder.ini &&
-        grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
-    then
-        sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini
-    fi
+	cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
+    sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
+    sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
+    cat >>/etc/rbfeeder.ini <<"EOF"
+[network]
+mode=beast
+external_port=30005
+external_host=127.0.0.1
+EOF
     systemctl restart rbfeeder &>/dev/null || true
 fi
 

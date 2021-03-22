@@ -66,11 +66,6 @@ fi
 systemctl stop fr24feed &>/dev/null || true
 systemctl stop rb-feeder &>/dev/null || true
 
-if grep -qs -e 'network_mode=false' /etc/rbfeeder.ini &>/dev/null && grep -qs -e 'mode=beast' /etc/rbfeeder.ini && grep -qs -e 'external_port=30005' /etc/rbfeeder.ini && grep -qs -e 'external_host=127.0.0.1' /etc/rbfeeder.ini
-then
-    sed -i -e 's/network_mode=false/network_mode=true/' /etc/rbfeeder.ini || true
-fi
-
 if grep -qs -e '--device 0' /etc/default/readsb && { ! [[ -f /etc/default/dump1090-fa ]] || grep -qs -e '--device 0' /etc/default/dump1090-fa; }; then
     systemctl disable --now readsb &>/dev/null || true
 fi
@@ -80,6 +75,21 @@ systemctl disable --now dump1090 &>/dev/null || true
 rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 rm -f /etc/lighttpd/conf-enabled/*readsb*.conf &>/dev/null
 
+# configure rbfeeder to use readsb
+
+if [[ -f /etc/rbfeeder.ini ]]; then
+	cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
+    sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
+    sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
+    cat >>/etc/rbfeeder.ini <<"EOF"
+[network]
+mode=beast
+external_port=30005
+external_host=127.0.0.1
+EOF
+    systemctl restart rbfeeder &>/dev/null || true
+fi
+
 # configure fr24feed to use dump1090-fa
 
 if [ -f /etc/fr24feed.ini ]
@@ -88,9 +98,7 @@ then
 	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki
 	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
 	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
-else
-	echo "No fr24feed configuration found, if you are using fr24feed run sudo fr24feed --signup or use the fr24feed install script"
-	echo "After installing/configuring fr24feed, rerun this script to change the configuration for use of dump1090-fa"
+    systemctl restart fr24feed &>/dev/null || true
 fi
 
 sed -i -e 's/--net-ro-interval 1/--net-ro-interval 0.1/' /etc/default/dump1090-fa || true
@@ -105,8 +113,6 @@ if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-eng
 fi
 
 systemctl daemon-reload
-systemctl restart fr24feed &>/dev/null || true
-systemctl restart rb-feeder &>/dev/null || true
 systemctl restart lighttpd || true
 
 # script to change gain
