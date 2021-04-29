@@ -29,28 +29,8 @@ if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
 fi
 
-# blacklist kernel driver as on ancient systems
-if grep -E 'wheezy|jessie' /etc/os-release -qs; then
-    echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
-    set +e
-    rmmod rtl2832 &>/dev/null
-    rmmod dvb_usb_rtl28xxu &>/dev/null
-    rmmod rtl8xxxu &>/dev/null
-    rmmod rtl8192cu &>/dev/null
-    set -e
-fi
-
 ipath=/usr/local/share/adsb-wiki
 mkdir -p $ipath
-
-if grep -E 'jessie' /etc/os-release -qs; then
-    # make sure the rtl-sdr rules are present on jessie
-    set +e
-    wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
-    cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
-    udevadm control --reload-rules
-    set -e
-fi
 
 cd /tmp
 wget --timeout=30 -q -O repository.deb $repository

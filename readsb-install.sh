@@ -31,17 +31,19 @@ fi
 # blacklist kernel driver as on ancient systems
 if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+    set +e
     rmmod rtl2832 &>/dev/null
     rmmod dvb_usb_rtl28xxu &>/dev/null
     rmmod rtl8xxxu &>/dev/null
     rmmod rtl8192cu &>/dev/null
+    set -e
 fi
 
 ipath=/usr/local/share/adsb-wiki/readsb-install
 mkdir -p $ipath
 
-if grep -E 'jessie' /etc/os-release -qs; then
-    # make sure the rtl-sdr rules are present on jessie
+if grep -E 'wheezy|jessie' /etc/os-release -qs; then
+    # make sure the rtl-sdr rules are present on ancient systems
     wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
     cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
     udevadm control --reload-rules
