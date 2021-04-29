@@ -94,7 +94,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 # configure rbfeeder to use readsb
 
 if [[ -f /etc/rbfeeder.ini ]]; then
-	cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
+    cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
     sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
     sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
     cat >>/etc/rbfeeder.ini <<"EOF"
@@ -110,14 +110,14 @@ fi
 
 if [ -f /etc/fr24feed.ini ]
 then
-	chmod a+rw /etc/fr24feed.ini || true
+    chmod a+rw /etc/fr24feed.ini || true
     apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
-	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
+    cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
 
-	if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
-	if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
+    if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
+    if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
 
-	sed -i -e 's/receiver=.*/receiver="beast-tcp"/' -e 's/host=.*/host="127.0.0.1:30005"/' -e 's/bs=.*/bs="no"/' -e 's/raw=.*/raw="no"/' /etc/fr24feed.ini
+    sed -i -e 's/receiver=.*/receiver="beast-tcp"/' -e 's/host=.*/host="127.0.0.1:30005"/' -e 's/bs=.*/bs="no"/' -e 's/raw=.*/raw="no"/' /etc/fr24feed.ini
 
     systemctl restart fr24feed &>/dev/null || true
 fi
@@ -151,28 +151,28 @@ lat=$(echo $1 | tr -cd '[:digit:].-')
 lon=$(echo $2 | tr -cd '[:digit:].-')
 
 if ! awk "BEGIN{ exit ($lat > 90) }" || ! awk "BEGIN{ exit ($lat < -90) }"; then
-	echo
-	echo "Invalid latitude: $lat"
-	echo "Latitude must be between -90 and 90"
-	echo
-	echo "Example format for latitude: 51.528308"
-	echo
-	echo "Usage:"
-	echo "readsb-set-location 51.52830 -0.38178"
-	echo
-	exit 1
+    echo
+    echo "Invalid latitude: $lat"
+    echo "Latitude must be between -90 and 90"
+    echo
+    echo "Example format for latitude: 51.528308"
+    echo
+    echo "Usage:"
+    echo "readsb-set-location 51.52830 -0.38178"
+    echo
+    exit 1
 fi
 if ! awk "BEGIN{ exit ($lon > 180) }" || ! awk "BEGIN{ exit ($lon < -180) }"; then
-	echo
-	echo "Invalid longitude: $lon"
-	echo "Longitude must be between -180 and 180"
-	echo
-	echo "Example format for latitude: -0.38178"
-	echo
-	echo "Usage:"
-	echo "readsb-set-location 51.52830 -0.38178"
-	echo
-	exit 1
+    echo
+    echo "Invalid longitude: $lon"
+    echo "Longitude must be between -180 and 180"
+    echo
+    echo "Example format for latitude: -0.38178"
+    echo
+    echo "Usage:"
+    echo "readsb-set-location 51.52830 -0.38178"
+    echo
+    exit 1
 fi
 
 echo
