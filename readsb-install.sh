@@ -31,12 +31,10 @@ fi
 # blacklist kernel driver as on ancient systems
 if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
-    set +e
-    rmmod rtl2832 &>/dev/null
-    rmmod dvb_usb_rtl28xxu &>/dev/null
-    rmmod rtl8xxxu &>/dev/null
-    rmmod rtl8192cu &>/dev/null
-    set -e
+    rmmod rtl2832 &>/dev/null || true
+    rmmod dvb_usb_rtl28xxu &>/dev/null || true
+    rmmod rtl8xxxu &>/dev/null || true
+    rmmod rtl8192cu &>/dev/null || true
 fi
 
 ipath=/usr/local/share/adsb-wiki/readsb-install
@@ -113,9 +111,14 @@ fi
 if [ -f /etc/fr24feed.ini ]
 then
 	chmod a+rw /etc/fr24feed.ini || true
+    apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
 	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
-	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
-	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini || true
+
+	if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
+	if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
+
+	sed -i -e 's/receiver=.*/receiver="beast-tcp"/' -e 's/host=.*/host="127.0.0.1:30005"/' -e 's/bs=.*/bs="no"/' -e 's/raw=.*/raw="no"/' /etc/fr24feed.ini
+
     systemctl restart fr24feed &>/dev/null || true
 fi
 

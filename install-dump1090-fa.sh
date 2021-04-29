@@ -74,10 +74,15 @@ fi
 
 if [ -f /etc/fr24feed.ini ]
 then
-	chmod a+rw /etc/fr24feed.ini
-	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki
-	if ! grep host /etc/fr24feed.ini &>/dev/null; then sed -i -e '/fr24key/a host=' /etc/fr24feed.ini; fi
-	sed -i -e 's/receiver=.*/receiver="beast-tcp"\r/' -e 's/host=.*/host="127.0.0.1:30005"\r/' -e 's/bs=.*/bs="no"\r/' -e 's/raw=.*/raw="no"\r/' /etc/fr24feed.ini
+	chmod a+rw /etc/fr24feed.ini || true
+    apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
+	cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
+
+	if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
+	if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
+
+	sed -i -e 's/receiver=.*/receiver="beast-tcp"/' -e 's/host=.*/host="127.0.0.1:30005"/' -e 's/bs=.*/bs="no"/' -e 's/raw=.*/raw="no"/' /etc/fr24feed.ini
+
     systemctl restart fr24feed &>/dev/null || true
 fi
 
