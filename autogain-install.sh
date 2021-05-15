@@ -192,7 +192,7 @@ EOF
 
 cat >/lib/systemd/system/autogain1090.timer <<"EOF"
 [Unit]
-Description=Nightly automic gain adjustment for readsb or dump1090-fa
+Description=Nightly automatic gain adjustment for readsb or dump1090-fa
 
 [Timer]
 OnCalendar=*-*-* 02:30:00
