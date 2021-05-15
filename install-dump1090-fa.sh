@@ -43,6 +43,8 @@ if ! /usr/bin/dump1090-fa --help >/dev/null; then
     exit 1
 fi
 
+udevadm control --reload-rules || true
+
 systemctl stop fr24feed &>/dev/null || true
 systemctl stop rb-feeder &>/dev/null || true
 

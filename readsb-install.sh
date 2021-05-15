@@ -44,13 +44,15 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     # make sure the rtl-sdr rules are present on ancient systems
     wget -O /tmp/rtl-sdr.rules https://raw.githubusercontent.com/wiedehopf/adsb-scripts/master/osmocom-rtl-sdr.rules
     cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
-    udevadm control --reload-rules
 fi
 
 apt-get update || true
 apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \
     librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
     libncurses5-dev lighttpd zlib1g-dev zlib1g unzip
+
+
+udevadm control --reload-rules || true
 
 rm -rf "$ipath"/git
 if ! git clone --branch stale --depth 1 "$repository" "$ipath/git"
