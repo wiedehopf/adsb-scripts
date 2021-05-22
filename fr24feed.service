@@ -7,7 +7,7 @@ Type=simple
 Restart=always
 ExecStartPre=-/bin/rm -f /dev/shm/decoder.txt
 
-ExecStart=/bin/bash -c "/usr/bin/fr24feed | sed -u -e 's/[0-9,-]* [0-9,:]* | //' | grep -F -e imeout -e rror -e info -e main -e onnect -e reader -e '[mlat][i]Stats' --line-buffered | perl -ne 'print if (/mlat..i.Stats/ and not $n++ % 777) or not /mlat..i.Stats/;$|=1' "
+ExecStart=/bin/bash -c "stdbuf -oL -eL /usr/bin/fr24feed | stdbuf -oL -eL sed -u -e 's/[0-9,-]* [0-9,:]* | //' | stdbuf -oL -eL grep -v -e '::on_periodic_refresh:' -e 'Synchronizing time via NTP' -e 'synchronized correctly' -e 'Pinging' -e 'time references AC' -e 'mlat.... [A-F,0-9]*' -e '.feed..n.ping ' -e 'syncing stream' -e 'saving bandwidth' | stdbuf -oL -eL perl -ne 'print if (not /mlat..i.Stats/ or ($n++ % 58 == 3)) and (not /feed....sent/ or ($m++ % 250 == 10)) and (not /stats.sent/ or ($k++ % 6 == 1)) ;$|=1'"
 
 User=fr24
 PermissionsStartOnly=true
@@ -21,4 +21,3 @@ StartLimitBurst=100
 
 [Install]
 WantedBy=multi-user.target
-
