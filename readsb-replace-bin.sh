@@ -51,7 +51,7 @@ fi
 rm -f /usr/bin/viewadsb
 cp viewadsb /usr/bin
 
-for bin in readsb adsbxfeeder feed-asdbx adsbx-978; do
+for bin in readsb adsbxfeeder feed-asdbx; do
     FILE="/usr/bin/$bin"
     if [[ -f $FILE ]]; then
         rm -f "$FILE"

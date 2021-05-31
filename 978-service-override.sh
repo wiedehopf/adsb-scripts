@@ -21,7 +21,7 @@ if [[ "${DUMP978}" == "yes" ]]; then
 	sudo systemctl enable --now adsbexchange-978-convert.service
 	sudo systemctl enable --now tar1090-978.service
 
-	/usr/bin/adsbx-978 \
+	/usr/bin/adsbx-978 --net-only \
 	 $RECEIVER_978_OPTIONS $DECODER_978_OPTIONS $NET_978_OPTIONS $JSON_978_OPTIONS \
 	--lat ${LATITUDE} --lon ${LONGITUDE} \
 	 --net-ri-port $AVR_978_IN_PORT \
