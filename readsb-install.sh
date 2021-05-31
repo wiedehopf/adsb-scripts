@@ -105,6 +105,7 @@ mode=beast
 external_port=30005
 external_host=127.0.0.1
 EOF
+    pkill -9 rbfeeder || true
     systemctl restart rbfeeder &>/dev/null || true
 fi
 
