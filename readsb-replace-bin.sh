@@ -51,12 +51,16 @@ fi
 rm -f /usr/bin/viewadsb
 cp viewadsb /usr/bin
 
-for bin in readsb adsbxfeeder feed-asdbx; do
-    rm -f "/usr/bin/$bin"
-    cp readsb "/usr/bin/$bin"
+for bin in readsb adsbxfeeder feed-asdbx adsbx-978; do
+    FILE="/usr/bin/$bin"
+    if [[ -f $FILE ]]; then
+        rm -f "$FILE"
+        cp readsb "$FILE"
+    fi
 done
 
 echo "Restarting readsb!"
 systemctl restart readsb || true
 systemctl restart adsbexchange-feed &>/dev/null || true
+systemctl restart adsbexchange-978 &>/dev/null || true
 echo "All done! Reboot recommended."
