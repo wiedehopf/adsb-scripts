@@ -1,6 +1,5 @@
 #!/bin/bash
 systemctl stop adsbexchange-978
-systemctl stop adsb-exchange-978
 cat >/usr/bin/adsbx-978-start <<"EOF"
 #!/bin/bash
 
@@ -42,7 +41,6 @@ EOF
 chmod a+x /usr/bin/adsbx-978-start
 
 systemctl restart adsbexchange-978
-systemctl restart adsb-exchange-978
 
 if [[ -f /etc/default/dump978-fa ]]; then
     sed -i -e 's/RECEIVER_OPTIONS.*/RECEIVER_OPTIONS="--sdr-gain 43.9 --sdr driver=rtlsdr,serial=978 --format CS8"/' /etc/default/dump978-fa
