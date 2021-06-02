@@ -60,13 +60,14 @@ fi
 start=$(jq '.total.start' < $stats)
 end=$(jq '.total.end' < $stats)
 
-if ! awk "BEGIN{ exit  ($end < $start + 70) }"; then
+strong=$(jq '.total.local.strong_signals' < $stats | tee $tmp/strong)
+total=$(jq '.total.local.accepted | add' < $stats | tee $tmp/total)
+
+if ! awk "BEGIN{ exit  ($total < 1000) }"; then
     echo "The decoder hasn't been running long enough, wait a bit!"
     exit 1
 fi
 
-strong=$(jq '.total.local.strong_signals' < $stats | tee $tmp/strong)
-total=$(jq '.total.local.accepted | add' < $stats | tee $tmp/total)
 
 if [[ -z $strong ]] || [[ -z $total ]]; then
     echo "unrecognized format: $stats"
