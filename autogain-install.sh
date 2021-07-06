@@ -155,7 +155,9 @@ fi
 if [ -f /boot/adsb-config.txt ]; then
     sed --follow-symlinks -i -E -e "s/^GAIN.*/GAIN=$gain/" /boot/adsb-config.txt
 else
-    if ! grep gain /etc/default/$APP &>/dev/null; then sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP;fi
+    if ! grep gain /etc/default/$APP &>/dev/null && grep -E 'device-type.*rtlsdr' /etc/default/$APP &>/dev/null; then
+      sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP
+    fi
     sed --follow-symlinks -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
 fi
 
