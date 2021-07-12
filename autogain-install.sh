@@ -29,8 +29,8 @@ cat >/usr/local/bin/autogain1090 <<"EOF"
 #!/bin/bash
 low=0.5
 high=7.0
-source /etc/default/autogain1090
 ga=(0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 -10)
+source /etc/default/autogain1090
 tmp=/var/tmp/autogain1090
 mkdir -p $tmp
 
