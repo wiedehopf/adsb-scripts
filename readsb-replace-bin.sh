@@ -38,13 +38,13 @@ function gitUpdate() {
 gitUpdate "$repository" "$ipath/git" "$branch"
 
 function compile() {
-	make clean && make -j2 AIRCRAFT_HASH_BITS=12 RTLSDR=yes OPTIMIZE="-march=native"
+	make clean && make -j2 AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-march=native"
 }
 
 if ! compile; then
     aptUpdate
 	apt-get install --no-install-recommends --no-install-suggests -y build-essential libusb-1.0-0-dev \
-		librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g || true
+		librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g pkg-config || true
 	compile
 fi
 

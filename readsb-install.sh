@@ -46,16 +46,31 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
 fi
 
-apt-get update || true
-apt-get install --no-install-recommends --no-install-suggests -y git build-essential debhelper libusb-1.0-0-dev \
-    librtlsdr-dev librtlsdr0 pkg-config dh-systemd \
-    libncurses5-dev lighttpd zlib1g-dev zlib1g unzip
+function aptinstall() {
+    apt install --no-install-recommends --no-install-suggests -y \
+        git build-essential debhelper libusb-1.0-0-dev \
+        librtlsdr-dev librtlsdr0 pkg-config \
+        libncurses5-dev lighttpd zlib1g-dev zlib1g
+}
 
+aptinstall || { apt update && aptinstall || true; }
 
 udevadm control --reload-rules || true
 
-rm -rf "$ipath"/git
-if ! git clone --branch stale --depth 1 "$repository" "$ipath/git"
+function getGIT() {
+    # getGIT $REPO $BRANCH $TARGET-DIR
+    if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+        echo "getGIT wrong usage, check your script or tell the author!" 1>&2
+        return 1
+    fi
+    if ! cd "$3" &>/dev/null || ! git fetch --depth 2 origin "$2" || ! git reset --hard FETCH_HEAD; then
+        if ! rm -rf "$3" || ! git clone --depth 2 --single-branch --branch "$2" "$1" "$3"; then
+            return 1
+        fi
+    fi
+    return 0
+}
+if ! getGIT "$repository" "stale" "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
@@ -66,7 +81,7 @@ rm -rf "$ipath"/readsb*.deb
 cd "$ipath/git"
 
 export DEB_BUILD_OPTIONS=noddebs
-if ! dpkg-buildpackage -b -Prtlsdr -ui -uc -us
+if ! dpkg-buildpackage -b -Prtlsdr,native -ui -uc -us
 then
     echo "Something went wrong building the debian package, exiting!"
     exit 1
@@ -80,11 +95,6 @@ then
 fi
 echo "Package installed!"
 
-cp -n debian/lighttpd/* /etc/lighttpd/conf-available 
-
-systemctl stop fr24feed &>/dev/null || true
-systemctl stop rb-feeder &>/dev/null || true
-
 if grep -qs -e '--device 0' /etc/default/dump1090-fa && { ! [[ -f /etc/default/readsb ]] || grep -qs -e '--device 0' /etc/default/readsb; }; then
     systemctl disable --now dump1090-fa &>/dev/null || true
 fi
@@ -96,6 +106,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 # configure rbfeeder to use readsb
 
 if [[ -f /etc/rbfeeder.ini ]]; then
+    systemctl stop rb-feeder &>/dev/null || true
     cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
     sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
     sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
@@ -113,6 +124,7 @@ fi
 
 if [ -f /etc/fr24feed.ini ]
 then
+    systemctl stop fr24feed &>/dev/null || true
     chmod a+rw /etc/fr24feed.ini || true
     apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
     cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
@@ -123,10 +135,6 @@ then
     sed -i -e 's/receiver=.*/receiver="beast-tcp"/' -e 's/host=.*/host="127.0.0.1:30005"/' -e 's/bs=.*/bs="no"/' -e 's/raw=.*/raw="no"/' /etc/fr24feed.ini
 
     systemctl restart fr24feed &>/dev/null || true
-fi
-
-if (( $(cat /etc/lighttpd/conf-enabled/* | grep -c -E -e '^server.stat-cache-engine *\= *"disable"') > 1 )); then
-    rm -f /etc/lighttpd/conf-enabled/88-readsb-statcache.conf
 fi
 
 systemctl enable readsb
@@ -200,17 +208,17 @@ bash tar1090-install.sh /run/readsb
 if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
     echo --------------
     echo --------------
-    journalctl -u readsb | tail -n30
+    journalctl -u readsb | tail -n30 | tee journal.log
     echo --------------
     echo --------------
-    echo "ERROR: readsb service didn't start, if inquiring about the issue please post the above 30 lines of log!"
-    echo "       common issues: SDR not plugged in."
-    echo "       the webinterface will show an error until readsb is running!"
-    echo "       Try if a reboot solves the issue. To check if readsb is running use:"
-    echo "           sudo systemctl status readsb"
-    echo --------------
+    if grep -qs -e 'Permission denied' journal.log; then
+        echo "ERROR: readsb permission issue, please perform a reboot using this command: sudo reboot"
+    else
+        echo "ERROR: readsb service didn't start."
+        echo "       common issues: SDR not plugged in."
+        echo "       the webinterface will show an error until readsb is running!"
+        echo "       If you can't fix the issue:"
+        echo "            Open a github issue or contact wiedehopf on the adsbexchange discord and post the above 30 lines of log!"
+        echo --------------
+    fi
 fi
-
-echo --------------
-echo "This used to install a no longer maintained readsb interface, it now installs tar1090 as a webinterface instead."
-echo "All done! Webinterface available at http://$(ip route | grep -m1 -o -P 'src \K[0-9,.]*')/tar1090"
