@@ -12,6 +12,21 @@ systemctl stop dump1090-fa-autogain.timer &>/dev/null
 rm -f /lib/systemd/system/dump1090-fa-autogain.service
 rm -f /lib/systemd/system/dump1090-fa-autogain.timer
 
+if grep -qs /etc/default/dump1090-fa -e 'CONFIG_STYLE.*6' && ! [[ -f /boot/piaware-config.txt ]]; then
+    echo ------------
+    echo dump1090-fa new config style is not supported, sorry.
+    echo Also dump1090-fa version 6 has its own autogain, that should be sufficient.
+    echo Try readsb if you want to continue using this script:
+    echo "https://github.com/wiedehopf/adsb-scripts/wiki/Automatic-installation-for-readsb"
+    echo ------------
+    systemctl disable autogain1090.timer &>/dev/null
+    systemctl stop autogain1090.timer &>/dev/null
+
+    rm -f /lib/systemd/system/autogain1090.service
+    rm -f /lib/systemd/system/autogain1090.timer
+    exit 1
+fi
+
 if ! command -v jq &> /dev/null; then
     apt update
     apt install -y --no-install-suggests --no-install-recommends jq
