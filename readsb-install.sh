@@ -95,9 +95,7 @@ then
 fi
 echo "Package installed!"
 
-if grep -qs -e '--device 0' /etc/default/dump1090-fa && { ! [[ -f /etc/default/readsb ]] || grep -qs -e '--device 0' /etc/default/readsb; }; then
-    systemctl disable --now dump1090-fa &>/dev/null || true
-fi
+apt remove -y dump1090-fa &>/dev/null || true
 systemctl disable --now dump1090-mutability &>/dev/null || true
 systemctl disable --now dump1090 &>/dev/null || true
 
