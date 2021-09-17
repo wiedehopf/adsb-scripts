@@ -219,4 +219,9 @@ if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
         echo "            Open a github issue or contact wiedehopf on the adsbexchange discord and post the above 30 lines of log!"
         echo --------------
     fi
+else
+    echo "Don't forget ot set your location using decimal latitude and longitude:"
+    echo
+    echo "sudo readsb-set-location 50.12344 10.23429"
+    echo
 fi
