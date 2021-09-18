@@ -17,7 +17,7 @@ then
     repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1~bpo9+1_all.deb"
 elif grep -qs buster /etc/os-release
 then
-    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_5.0_all.deb"
+    repository="http://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_6.1_all.deb"
 else
     echo "Only Raspbian Stretch and Buster are supported by this script, exiting!"
     exit 1
