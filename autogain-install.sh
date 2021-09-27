@@ -12,7 +12,7 @@ systemctl stop dump1090-fa-autogain.timer &>/dev/null
 rm -f /lib/systemd/system/dump1090-fa-autogain.service
 rm -f /lib/systemd/system/dump1090-fa-autogain.timer
 
-if grep -qs /etc/default/dump1090-fa -e 'CONFIG_STYLE.*6' && ! [[ -f /boot/piaware-config.txt ]]; then
+if ! [[ -f /etc/default/readsb ]] && grep -qs /etc/default/dump1090-fa -e 'CONFIG_STYLE.*6' && ! [[ -f /boot/piaware-config.txt ]]; then
     echo ------------
     echo dump1090-fa new config style is not supported, sorry.
     echo Also dump1090-fa version 6 has its own autogain, that should be sufficient.
