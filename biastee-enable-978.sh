@@ -6,7 +6,7 @@ if ! command -v git &>/dev/null || ! command -v cmake &>/dev/null; then
     apt install -y --no-install-suggests --no-install-recommends make cmake git build-essential libusb-1.0-0-dev
 fi
 ipath=/usr/local/share/adsb-wiki/biastee
-APPS="dump1090-fa readsb"
+APPS="dump978-fa"
 rm -rf $ipath
 mkdir -p $ipath
 cd $ipath
