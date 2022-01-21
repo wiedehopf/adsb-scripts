@@ -49,6 +49,9 @@ source /etc/default/autogain1090
 tmp=/var/tmp/autogain1090
 mkdir -p $tmp
 
+#work around stupid locale stuff
+export LC_ALL=C
+
 APP=dump1090-fa
 if [[ -f /run/dump1090-fa/stats.json ]]; then
     APP=dump1090-fa
@@ -78,16 +81,16 @@ end=$(jq '.total.end' < $stats)
 strong=$(jq '.total.local.strong_signals' < $stats | tee $tmp/strong)
 total=$(jq '.total.local.accepted | add' < $stats | tee $tmp/total)
 
+if [[ -z $strong ]] || [[ -z $total ]]; then
+    echo "unrecognized format: $stats"
+    exit 1
+fi
+
 if ! awk "BEGIN{ exit  ($total < 1000) }"; then
     echo "The decoder hasn't been running long enough, wait a bit!"
     exit 1
 fi
 
-
-if [[ -z $strong ]] || [[ -z $total ]]; then
-    echo "unrecognized format: $stats"
-    exit 1
-fi
 
 if [[ $oldtotal > $total ]] || [[ $oldstrong > $strong ]] || [[ $oldtotal == $total ]]; then
 	oldstrong=0
@@ -137,6 +140,7 @@ fi
 if ! awk "BEGIN{ exit ($strong > $low) }" && ! awk "BEGIN{ exit ($strong < $high) }"; then
 	echo "No gain change needed, percentage of messages >-3dB is in nominal range. (${strong}%)"
 	exit 0
+
 fi
 
 if ! awk "BEGIN{ exit ($strong < $low) }" && [[ $gain_index == 29 ]]; then
