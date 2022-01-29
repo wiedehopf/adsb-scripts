@@ -143,9 +143,10 @@ systemctl restart readsb || true
 mkdir -p /usr/local/bin
 cat >/usr/local/bin/readsb-gain <<"EOF"
 #!/bin/bash
+validre='^(-10|[0-9]+([.][0-9]+)?)$'
 gain=$(echo $1 | tr -cd '[:digit:].-')
-if [[ $gain == "" ]]; then echo "Error, invalid gain!"; exit 1; fi
-if ! grep gain /etc/default/readsb &>/dev/null; then sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/readsb; fi
+if ! [[ $gain =~ $validre ]] ; then echo "Error, invalid gain!"; exit 1; fi
+if ! grep gain /etc/default/readsb &>/dev/null; then sudo sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/readsb; fi
 sudo sed -i -E -e "s/--gain .?[0-9]*.?[0-9]* /--gain $gain /" /etc/default/readsb
 sudo systemctl restart readsb
 EOF
