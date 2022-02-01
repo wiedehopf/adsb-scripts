@@ -2,7 +2,11 @@
 
 sudo apt update
 sudo apt install -y perl wget
-sudo apt remove -y fr24feed
+
+# remove fr24feed in package form
+sudo apt purge -y fr24feed
+# remove the fr24feed updater (should be removed with the package but let's make real sure)
+sudo rm -f /etc/cron.d/fr24feed_updater
 
 set -e
 
@@ -12,7 +16,7 @@ rm /tmp/fr24 -rf
 mkdir -p /tmp/fr24
 cd /tmp
 
-wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.29-6_armhf.deb
+wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.29-7_armhf.deb
 
 dpkg -x fr24.deb fr24
 cp -f fr24/usr/bin/fr24feed* /usr/bin
