@@ -34,6 +34,10 @@ done
 systemctl daemon-reload
 for APP in $APPS; do
     if systemctl show $APP 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
+        echo biastee will be enabled on $APP start
+        echo restarting $APP
         systemctl restart $APP || true
     fi
 done
+
+echo ----- all done ------

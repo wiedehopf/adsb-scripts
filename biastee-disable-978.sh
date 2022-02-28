@@ -17,3 +17,5 @@ for APP in $APPS; do
     fi
 done
 rm -rf $ipath
+
+echo ----- all done ------

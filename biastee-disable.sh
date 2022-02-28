@@ -4,6 +4,12 @@ ipath=/usr/local/share/adsb-wiki/biastee
 APPS="dump1090-fa readsb"
 
 for APP in $APPS; do
+    if systemctl show $APP 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
+        systemctl stop $APP || true
+    fi
+done
+
+for APP in $APPS; do
     rm -f /etc/systemd/system/$APP.service.d/bias-t.conf
 done
 
@@ -17,3 +23,5 @@ for APP in $APPS; do
     fi
 done
 rm -rf $ipath
+
+echo ----- all done ------

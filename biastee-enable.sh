@@ -22,6 +22,13 @@ make
 popd
 
 for APP in $APPS; do
+    if systemctl show $APP 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
+        echo stopping $APP
+        systemctl stop $APP || true
+    fi
+done
+
+for APP in $APPS; do
     mkdir -p /etc/systemd/system/$APP.service.d
     cat > /etc/systemd/system/$APP.service.d/bias-t.conf << "EOF"
 [Service]
@@ -34,6 +41,10 @@ done
 systemctl daemon-reload
 for APP in $APPS; do
     if systemctl show $APP 2>/dev/null | grep -qs 'UnitFileState=enabled'; then
+        echo biastee will be enabled on $APP start
+        echo restarting $APP
         systemctl restart $APP || true
     fi
 done
+
+echo ----- all done ------
