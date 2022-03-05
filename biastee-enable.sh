@@ -1,10 +1,15 @@
 #!/bin/bash
 renice 10 $$
 set -e
-if ! command -v git &>/dev/null || ! command -v cmake &>/dev/null; then
-    apt update
-    apt install -y --no-install-suggests --no-install-recommends make cmake git build-essential libusb-1.0-0-dev
-fi
+function aptInstall() {
+    if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
+        apt update
+        apt install -y --no-install-recommends --no-install-suggests "$@"
+    fi
+}
+
+aptInstall make cmake git build-essential libusb-1.0-0-dev librtlsdr-dev
+
 ipath=/usr/local/share/adsb-wiki/biastee
 APPS="dump1090-fa readsb"
 rm -rf $ipath
