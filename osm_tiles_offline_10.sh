@@ -10,5 +10,9 @@ cd "$IPATH"
 
 F=osm_tiles_10.tar.gz
 wget -O $F https://www.adsbexchange.com/myip/downloads/$F
+
+echo Extracting, this will take a bit .....
 tar --overwrite -x -f $F
 rm -f $F
+
+echo ................................. done
