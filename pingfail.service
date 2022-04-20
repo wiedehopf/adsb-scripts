@@ -7,7 +7,7 @@ After=network.target
 [Service]
 ExecStart=/bin/bash /usr/local/share/adsb-scripts/pingfail.sh
 Type=simple
-Restart=no
+Restart=always
 
 [Install]
 WantedBy=default.target
