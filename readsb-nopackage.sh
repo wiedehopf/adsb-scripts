@@ -24,7 +24,7 @@ function aptInstall() {
     fi
 }
 
-aptInstall git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g
+aptInstall git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libncurses-dev zlib1g-dev zlib1g
 
 function getGIT() {
     # getGIT $REPO $BRANCH $TARGET (directory)

@@ -50,7 +50,7 @@ function aptinstall() {
     apt install --no-install-recommends --no-install-suggests -y \
         git build-essential debhelper libusb-1.0-0-dev \
         librtlsdr-dev librtlsdr0 pkg-config \
-        libncurses5-dev lighttpd zlib1g-dev zlib1g
+        libncurses-dev lighttpd zlib1g-dev zlib1g
 }
 
 aptinstall || { apt update && aptinstall || true; }

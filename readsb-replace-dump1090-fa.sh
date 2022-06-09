@@ -44,7 +44,7 @@ function compile() {
 if ! compile; then
     aptUpdate
 	apt-get install --no-install-recommends --no-install-suggests -y build-essential libusb-1.0-0-dev \
-		librtlsdr-dev librtlsdr0 libncurses5-dev zlib1g-dev zlib1g pkg-config || true
+		librtlsdr-dev librtlsdr0 libncurses-dev zlib1g-dev zlib1g pkg-config || true
 	compile
 fi
 
