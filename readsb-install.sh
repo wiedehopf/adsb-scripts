@@ -213,6 +213,8 @@ if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
     echo --------------
     if grep -qs -e 'Permission denied' journal.log; then
         echo "ERROR: readsb permission issue, please perform a reboot using this command: sudo reboot"
+        echo "--------------"
+        echo "After the reboot, the webinterface will be available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/tar1090"
     else
         echo "ERROR: readsb service didn't start."
         echo "       common issues: SDR not plugged in."
