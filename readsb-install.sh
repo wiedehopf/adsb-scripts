@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ "$(id -u)" != "0" ]; then
+    echo -e "\033[33m"
+    echo "This script must be ran using sudo or as root."
+    echo -e "\033[37m"
+    exit 1
+fi
+
 set -e
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
@@ -48,9 +55,9 @@ fi
 
 function aptinstall() {
     apt install --no-install-recommends --no-install-suggests -y \
-        git build-essential debhelper libusb-1.0-0-dev \
+        git gcc make libusb-1.0-0-dev \
         librtlsdr-dev librtlsdr0 pkg-config \
-        libncurses-dev lighttpd zlib1g-dev zlib1g
+        libncurses-dev zlib1g-dev zlib1g
 }
 
 aptinstall || { apt update && aptinstall || true; }
@@ -77,23 +84,26 @@ then
 fi
 
 rm -rf "$ipath"/readsb*.deb
-
 cd "$ipath/git"
 
-export DEB_BUILD_OPTIONS=noddebs
-if ! dpkg-buildpackage -b -Prtlsdr,native -ui -uc -us
-then
-    echo "Something went wrong building the debian package, exiting!"
-    exit 1
-fi
+make clean
+THREADS=$(( $(grep -c ^processor /proc/cpuinfo) - 1 ))
+make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O3 -march=native" "$@"
 
-echo "Installing the Package"
-if ! dpkg -i ../readsb_*.deb
+cp -f debian/readsb.service /lib/systemd/system/readsb.service
+
+rm -f /usr/bin/readsb /usr/bin/viewadsb
+cp -f readsb /usr/bin/readsb
+cp -f viewadsb /usr/bin/viewadsb
+
+cp -n debian/readsb.default /etc/default/readsb
+
+if ! id -u readsb &>/dev/null
 then
-    echo "Something went wrong installing the debian package, exiting!"
-    exit 1
+    adduser --system --home $ipath --no-create-home --quiet readsb || adduser --system --home-dir $ipath --no-create-home readsb
+    adduser readsb plugdev || true # USB access
+    adduser readsb dialout || true # serial access
 fi
-echo "Package installed!"
 
 apt remove -y dump1090-fa &>/dev/null || true
 systemctl disable --now dump1090-mutability &>/dev/null || true
