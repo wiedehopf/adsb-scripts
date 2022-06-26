@@ -53,14 +53,24 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
     cp /tmp/rtl-sdr.rules /etc/udev/rules.d/
 fi
 
-function aptinstall() {
-    apt install --no-install-recommends --no-install-suggests -y \
-        git gcc make libusb-1.0-0-dev \
-        librtlsdr-dev librtlsdr0 pkg-config \
-        libncurses-dev zlib1g-dev zlib1g
+function aptInstall() {
+    if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
+        apt update
+        if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
+            apt clean -y || true
+            apt --fix-broken install -y || true
+            apt install --no-install-recommends --no-install-suggests -y $packages
+        fi
+    fi
 }
 
-aptinstall || { apt update && aptinstall || true; }
+if command -v apt &>/dev/null; then
+    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 pkg-config libncurses-dev zlib1g-dev zlib1g)
+    if ! command -v nginx &>/dev/null; then
+        packages+=(lighttpd)
+    fi
+    aptInstall "${packages[@]}"
+fi
 
 udevadm control --reload-rules || true
 
