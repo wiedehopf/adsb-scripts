@@ -1,16 +1,16 @@
 #!/bin/bash
 
-sudo apt update
-sudo apt install -y perl wget
+apt update
+apt install -y perl wget
 
 # remove fr24feed in package form
-sudo apt purge -y fr24feed
+apt purge -y fr24feed
 # remove the fr24feed updater (should be removed with the package but let's make real sure)
-sudo rm -f /etc/cron.d/fr24feed_updater
+rm -f /etc/cron.d/fr24feed_updater
 
 set -e
 
-sudo adduser --system --no-create-home fr24 || true
+adduser --system --no-create-home fr24 || true
 cd
 rm /tmp/fr24 -rf
 mkdir -p /tmp/fr24
