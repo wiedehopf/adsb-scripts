@@ -65,7 +65,7 @@ function aptInstall() {
 }
 
 if command -v apt &>/dev/null; then
-    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 pkg-config libncurses-dev zlib1g-dev zlib1g libzstd-dev)
+    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libncurses-dev zlib1g-dev zlib1g libzstd-dev)
     if ! command -v nginx &>/dev/null; then
         packages+=(lighttpd)
     fi
