@@ -32,10 +32,12 @@ function gitUpdate() {
 # get adsb-scripts repo
 gitUpdate "$repo" "$ipath/git" master
 
-cp acarsdec.service /lib/systemd/system
-cp -n acarsdec.default /etc/default/acarsdec
+cd acarsdec
 
-sed -i -e "s/UNKNOWN/$RANDOM$RANDOM/" /etc/default/acarsdec
+cp service /lib/systemd/system/acarsdec.service
+cp -n default /etc/default/acarsdec
+
+sed -i -e "s/XX-YYYYZ/$RANDOM-$RANDOM/" /etc/default/acarsdec
 
 # blacklist kernel driver as on ancient systems
 if grep -E 'wheezy|jessie' /etc/os-release -qs; then

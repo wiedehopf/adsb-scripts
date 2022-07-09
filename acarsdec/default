@@ -1,7 +1,7 @@
 OPTIONS0= -v -o 4 -j feed.acars.io:5550
 
-# username for acars.io:
-OPTIONS1= -i UNKNOWN
+# station name for acars.io:
+OPTIONS1= -i XX-YYYYZ
 
 # gain for rtl-sdr, for example 43.9 and -10 or 55 for AGC
 OPTIONS2= -g 55

@@ -1,0 +1,27 @@
+[Unit]
+Wants=network.target
+After=network.target
+
+[Service]
+User=vdlm2dec
+EnvironmentFile=/etc/default/vdlm2dec
+SyslogIdentifier=vdlm2dec
+
+ExecStart=/usr/local/bin/vdlm2dec \
+$OPTIONS0 \
+$OPTIONS1 \
+$OPTIONS2 \
+$OPTIONS3 \
+$OPTIONS4 \
+$OPTIONS5 \
+$OPTIONS6 \
+$OPTIONS7 \
+$OPTIONS8 \
+$OPTIONS9
+
+Type=simple
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

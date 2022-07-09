@@ -1,0 +1,17 @@
+OPTIONS0= -v -J -G -E -U -j feed.acars.io:5555
+
+# station name for acars.io:
+OPTIONS1= -i XX-YYYYZ
+
+# gain for rtl-sdr, 0 to 496 (value is in tenth, so 200 will be 20.0)
+OPTIONS2= -g 439
+
+# to have the messages written to disk instead of the journal, uncomment the following line:
+# OPTIONS4= -l /var/tmp/vdlm2dec
+
+# rtl-sdr device id or serial:
+OPTIONS7= -r 0
+
+# frequencies scanned:
+OPTIONS8= 136.650 136.800 136.975
+
