@@ -1,11 +1,14 @@
 #!/bin/bash
 set -e
+trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
+renice 10 $$
+
 cd /tmp
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
 stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
-branch="testing"
+branch="master"
 
 if [[ -n $1 ]]; then
     branch="$1"
@@ -15,24 +18,20 @@ apt install -y $stuff || apt update && apt install -y $stuff || true
 
 mkdir -p $ipath
 
-function gitUpdate() {
-    _REPO="$1"
-    _DIR="$2"
-    _BRANCH="$3"
-    { cd "$_DIR" &>/dev/null && git fetch --depth 1 origin "$_BRANCH" && git reset --hard origin/"$_BRANCH"; } ||
-    { cd /tmp && rm -rf "$_DIR" && git clone --depth 1 --branch "$_BRANCH" "$_REPO" "$_DIR"; }
-
-    if ! cd "$_DIR" || ! git rev-parse
-    then
-        echo "Unable to download files, exiting! (Maybe try again?)"
-        exit 1
-    fi
+function getGIT() {
+    # getGIT $REPO $BRANCH $TARGET (directory)
+    if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then echo "getGIT wrong usage, check your script or tell the author!" 1>&2; return 1; fi
+    REPO="$1"; BRANCH="$2"; TARGET="$3"; pushd .
+    if cd "$TARGET" &>/dev/null && git fetch --depth 1 origin "$BRANCH" && git reset --hard FETCH_HEAD; then popd; return 0; fi
+    if ! cd /tmp || ! rm -rf "$TARGET"; then popd; return 1; fi
+    if git clone --depth 1 --single-branch --branch "$2" "$1" "$3"; then popd; return 0; fi
+    popd; return 1;
 }
 
 # get adsb-scripts repo
-gitUpdate "$repo" "$ipath/git" master
+getGIT "$repo" master "$ipath/git"
 
-cd acarsdec
+cd "$ipath/git/acarsdec"
 
 cp service /lib/systemd/system/acarsdec.service
 cp -n default /etc/default/acarsdec
@@ -52,7 +51,9 @@ adduser --system --home $ipath --no-create-home --quiet acarsdec
 adduser acarsdec plugdev
 
 GIT="$ipath/acarsdec-git"
-gitUpdate https://github.com/airframesio/acarsdec.git "$GIT" "$branch"
+getGIT https://github.com/TLeconte/acarsdec "$branch" "$GIT"
+
+cd "$GIT"
 
 rm -rf build
 mkdir build
