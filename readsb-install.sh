@@ -247,6 +247,10 @@ if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
 else
     echo "Don't forget ot set your location using decimal latitude and longitude:"
     echo
-    echo "sudo readsb-set-location 50.12344 10.23429"
+    if echo $PATH | grep -qs '/usr/local/bin'; then
+        echo "sudo readsb-set-location 50.12344 10.23429"
+    else
+        echo "sudo /usr/local/bin/readsb-set-location 50.12344 10.23429"
+    fi
     echo
 fi
