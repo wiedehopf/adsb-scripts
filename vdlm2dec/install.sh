@@ -51,7 +51,8 @@ adduser --system --home $ipath --no-create-home --quiet vdlm2dec
 adduser vdlm2dec plugdev
 
 GIT="$ipath/vdlm2dec-git"
-getGIT https://github.com/TLeconte/vdlm2dec "$branch" "$GIT"
+#getGIT https://github.com/TLeconte/vdlm2dec "$branch" "$GIT"
+getGIT https://github.com/wiedehopf/vdlm2dec "$branch" "$GIT"
 
 cd "$GIT"
 

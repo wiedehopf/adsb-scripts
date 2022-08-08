@@ -51,7 +51,8 @@ adduser --system --home $ipath --no-create-home --quiet acarsdec
 adduser acarsdec plugdev
 
 GIT="$ipath/acarsdec-git"
-getGIT https://github.com/TLeconte/acarsdec "$branch" "$GIT"
+#getGIT https://github.com/TLeconte/acarsdec "$branch" "$GIT"
+getGIT https://github.com/wiedehopf/acarsdec "$branch" "$GIT"
 
 cd "$GIT"
 
