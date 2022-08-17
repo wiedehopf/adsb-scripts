@@ -10,7 +10,11 @@ rm -f /etc/cron.d/fr24feed_updater
 
 set -e
 
-adduser --system --no-create-home fr24 || true
+if ! id -u fr24 &>/dev/null; then
+    adduser --system --no-create-home fr24 || true
+    addgroup fr24 || true
+    adduser fr24 fr24 || true
+fi
 cd
 rm /tmp/fr24 -rf
 mkdir -p /tmp/fr24
