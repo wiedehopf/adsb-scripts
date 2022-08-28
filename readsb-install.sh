@@ -99,7 +99,7 @@ cd "$ipath/git"
 make clean
 THREADS=$(( $(grep -c ^processor /proc/cpuinfo) - 1 ))
 THREADS=$(( THREADS > 0 ? THREADS : 1 ))
-make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O3 -march=native" "$@"
+make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native" "$@"
 
 cp -f debian/readsb.service /lib/systemd/system/readsb.service
 
