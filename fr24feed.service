@@ -8,16 +8,16 @@ Restart=always
 ExecStartPre=-/bin/rm -f /dev/shm/decoder.txt
 ExecStopPost=-/bin/rm -f /dev/shm/decoder.txt
 
-ExecStart=/bin/bash -c "stdbuf -oL -eL /usr/bin/fr24feed | stdbuf -oL -eL sed -u -e 's/[0-9,-]* [0-9,:]* | //' | stdbuf -oL -eL grep -v -e '::on_periodic_refresh:' -e 'Synchronizing time via NTP' -e 'synchronized correctly' -e 'Pinging' -e 'time references AC' -e 'mlat.... [A-F,0-9]*' -e '.feed..n.ping ' -e 'syncing stream' -e 'saving bandwidth' | stdbuf -oL -eL perl -ne 'print if (not /mlat..i.Stats/ or ($n++ % 58 == 3)) and (not /feed....sent/ or ($m++ % 250 == 10)) and (not /stats.sent/ or ($k++ % 6 == 1)) ;$|=1'"
+ExecStart=/bin/bash -c "stdbuf -oL -eL /usr/bin/fr24feed | stdbuf -oL -eL sed -u -e 's/[0-9,-]* [0-9,:]* | //' | stdbuf -oL -eL grep -v -e '::on_periodic_refresh:' -e 'Synchronizing time via NTP' -e 'synchronized correctly' -e 'Pinging' -e 'time references AC' -e 'mlat.... [A-F,0-9]*' -e '.feed..n.ping ' -e '.feed..i.sent' -e 'syncing stream' -e 'saving bandwidth' | stdbuf -oL -eL perl -ne 'print if (not /mlat..i.Stats/ or ($n++ % 58 == 3)) and (not /sent.*aircraft/ or ($m++ % 250 == 10)) and (not /stats.sent/ or ($k++ % 6 == 1)) ;$|=1'"
 
 User=fr24
 PermissionsStartOnly=true
 SyslogIdentifier=fr24feed
 SendSIGHUP=yes
 TimeoutStopSec=5
-RestartSec=5
-StartLimitInterval=1
-StartLimitBurst=100
+RestartSec=0
+StartLimitInterval=5
+StartLimitBurst=20
 
 [Install]
 WantedBy=multi-user.target
