@@ -11,14 +11,6 @@ set -e
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
 
-if [ -f /boot/adsb-config.txt ]; then
-    echo --------
-    echo "You are using the adsbx image, this setup script would mess up the configuration."
-    echo --------
-    echo "Exiting."
-    exit 1
-fi
-
 if [ -f /boot/piaware-config.txt ]; then
     echo --------
     echo "You are using the piaware image, this setup script would mess up the configuration."
@@ -99,7 +91,16 @@ cd "$ipath/git"
 make clean
 THREADS=$(( $(grep -c ^processor /proc/cpuinfo) - 1 ))
 THREADS=$(( THREADS > 0 ? THREADS : 1 ))
-make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native" "$@"
+if [[ $1 == "sanitize" ]]; then
+    if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native -fsanitize=address -static-libasan"; then
+        if grep -qs /etc/os-release 'bullseye'; then apt install -y libasan6;
+        elif grep -qs /etc/os-release 'buster'; then apt install -y libasan5;
+        fi
+        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native -fsanitize=address -static-libasan"
+    fi
+else
+    make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native" "$@"
+fi
 
 cp -f debian/readsb.service /lib/systemd/system/readsb.service
 
