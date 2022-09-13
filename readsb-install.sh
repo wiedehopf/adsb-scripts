@@ -91,15 +91,23 @@ cd "$ipath/git"
 make clean
 THREADS=$(( $(grep -c ^processor /proc/cpuinfo) - 1 ))
 THREADS=$(( THREADS > 0 ? THREADS : 1 ))
+CFLAGS="-O2 -march=native"
+
+# disable unaligned access for arm 32bit ...
+if uname -m | grep -qs -e arm -e aarch64 && gcc -mno-unaligned-access hello.c -o /dev/null; then
+    CFLAGS+=" -mno-unaligned-access"
+fi
+
 if [[ $1 == "sanitize" ]]; then
-    if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native -fsanitize=address -static-libasan"; then
+    CFLAGS+="-fsanitize=address -static-libasan"
+    if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"; then
         if grep -qs /etc/os-release 'bullseye'; then apt install -y libasan6;
         elif grep -qs /etc/os-release 'buster'; then apt install -y libasan5;
         fi
-        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native -fsanitize=address -static-libasan"
+        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
     fi
 else
-    make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="-O2 -march=native" "$@"
+    make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS" "$@"
 fi
 
 cp -f debian/readsb.service /lib/systemd/system/readsb.service
