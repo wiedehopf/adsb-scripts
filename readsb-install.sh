@@ -46,7 +46,7 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
 fi
 
 function aptInstall() {
-    if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
+    if ! apt install -y --no-install-recommends --no-install-suggests "$@" &>/dev/null; then
         apt update
         if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
             apt clean -y || true
@@ -94,7 +94,7 @@ THREADS=$(( THREADS > 0 ? THREADS : 1 ))
 CFLAGS="-O2 -march=native"
 
 # disable unaligned access for arm 32bit ...
-if uname -m | grep -qs -e arm -e aarch64 && gcc -mno-unaligned-access hello.c -o /dev/null; then
+if uname -m | grep -qs -e arm -e aarch64 && gcc -mno-unaligned-access hello.c -o /dev/null &>/dev/null; then
     CFLAGS+=" -mno-unaligned-access"
 fi
 
