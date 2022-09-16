@@ -57,7 +57,10 @@ function aptInstall() {
 }
 
 if command -v apt &>/dev/null; then
-    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 ncurses-dev ncurses-bin zlib1g-dev zlib1g libzstd-dev libzstd1)
+    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 ncurses-dev ncurses-bin zlib1g-dev zlib1g)
+    if ! grep -E 'wheezy|jessie' /etc/os-release -qs; then
+        packages+=(libzstd-dev libzstd1)
+    fi
     if ! command -v nginx &>/dev/null; then
         packages+=(lighttpd)
     fi
@@ -79,7 +82,11 @@ function getGIT() {
     fi
     return 0
 }
-if ! getGIT "$repository" "stale" "$ipath/git"
+BRANCH="stale"
+if grep -E 'wheezy|jessie' /etc/os-release -qs; then
+    BRANCH="jessie"
+fi
+if ! getGIT "$repository" "$BRANCH" "$ipath/git"
 then
     echo "Unable to git clone the repository"
     exit 1
