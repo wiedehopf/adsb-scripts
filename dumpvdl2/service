@@ -1,0 +1,27 @@
+[Unit]
+Wants=network.target
+After=network.target
+
+[Service]
+User=dumpvdl2
+EnvironmentFile=/etc/default/dumpvdl2
+SyslogIdentifier=dumpvdl2
+
+ExecStart=/usr/local/bin/dumpvdl2 \
+$OPTIONS0 \
+$OPTIONS1 \
+$OPTIONS2 \
+$OPTIONS3 \
+$OPTIONS4 \
+$OPTIONS5 \
+$OPTIONS6 \
+$OPTIONS7 \
+$OPTIONS8 \
+$OPTIONS9
+
+Type=simple
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

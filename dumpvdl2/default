@@ -1,0 +1,21 @@
+# custom stuff you can add
+OPTIONS0=
+
+# station name for acars.io:
+OPTIONS1= --station-id XX-YYYYZ
+
+# gain for rtl-sdr
+OPTIONS2= --gain 40
+
+# send data to airframes.io
+OPTIONS3= --output decoded:json:udp:address=feed.airframes.io,port=5552
+
+# to have the messages written to disk for human viewing, uncomment the following line:
+#OPTIONS4= --output decoded:text:file:path=/var/tmp/dumpvdl2
+
+# rtl-sdr device id or serial:
+OPTIONS7= --rtlsdr 0
+
+# frequencies scanned:
+OPTIONS8= 136650000 136800000 136975000
+
