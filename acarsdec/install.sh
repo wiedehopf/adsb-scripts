@@ -31,6 +31,10 @@ function getGIT() {
 # get adsb-scripts repo
 getGIT "$repo" master "$ipath/git"
 
+if ! [[ -f "$ipath/libacars-installed" ]]; then
+    bash "$ipath/git/libacars/install.sh"
+fi
+
 cd "$ipath/git/acarsdec"
 
 cp service /lib/systemd/system/acarsdec.service

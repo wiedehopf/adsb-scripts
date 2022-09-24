@@ -31,6 +31,10 @@ function getGIT() {
 # get adsb-scripts repo
 getGIT "$repo" master "$ipath/git"
 
+if ! [[ -f "$ipath/libacars-installed" ]]; then
+    bash "$ipath/git/libacars/install.sh"
+fi
+
 cd "$ipath/git/vdlm2dec"
 
 cp service /lib/systemd/system/vdlm2dec.service
