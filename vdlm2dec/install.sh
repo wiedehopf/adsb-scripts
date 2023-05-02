@@ -44,11 +44,9 @@ sed -i -e "s/XX-YYYYZ/$RANDOM-$RANDOM/" /etc/default/vdlm2dec
 
 # blacklist kernel driver as on ancient systems
 if grep -E 'wheezy|jessie' /etc/os-release -qs; then
-    echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\nblacklist rtl8192cu\nblacklist rtl8xxxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
-    rmmod rtl2832 &>/dev/null
-    rmmod dvb_usb_rtl28xxu &>/dev/null
-    rmmod rtl8xxxu &>/dev/null
-    rmmod rtl8192cu &>/dev/null
+    echo -e 'blacklist rtl2832\nblacklist dvb_usb_rtl28xxu\n' > /etc/modprobe.d/blacklist-rtl-sdr.conf
+    rmmod rtl2832 &>/dev/null || true
+    rmmod dvb_usb_rtl28xxu &>/dev/null || true
 fi
 
 adduser --system --home $ipath --no-create-home --quiet vdlm2dec
