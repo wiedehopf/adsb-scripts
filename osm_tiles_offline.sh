@@ -9,7 +9,7 @@ mkdir -p "$IPATH"
 cd "$IPATH"
 
 F=osm_tiles_0_9.tar.gz
-wget -O $F https://www.adsbexchange.com/myip/downloads/$F
+wget -O $F https://github.com/wiedehopf/adsb-scripts/releases/download/osm2022/$F
 
 echo Extracting, this will take a bit .....
 tar --overwrite -x -f $F
