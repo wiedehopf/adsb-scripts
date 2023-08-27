@@ -8,7 +8,7 @@ cd /tmp
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
-stuff="git cmake zlib1g-dev"
+stuff="git cmake zlib1g-dev libjansson-dev"
 branch="master"
 
 if [[ -n $1 ]]; then
@@ -40,7 +40,7 @@ getGIT https://github.com/szpajder/libacars "$branch" "$GIT"
 
 cd "$GIT"
 
-VERSION=$(git rev-parse HEAD)
+VERSION="$(git rev-parse HEAD)_with-jansson"
 
 if grep -qs -e "$VERSION" "$ipath/libacars-installed"; then
     echo "---------------------------------------------"
