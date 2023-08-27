@@ -31,9 +31,7 @@ function getGIT() {
 # get adsb-scripts repo
 getGIT "$repo" master "$ipath/git"
 
-if ! [[ -f "$ipath/libacars-installed" ]]; then
-    bash "$ipath/git/libacars/install.sh"
-fi
+bash "$ipath/git/libacars/install.sh"
 
 cd "$ipath/git/vdlm2dec"
 

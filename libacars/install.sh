@@ -31,12 +31,23 @@ function getGIT() {
 # get adsb-scripts repo
 getGIT "$repo" master "$ipath/git"
 
+
 cd "$ipath/git/libacars"
 
 GIT="$ipath/libacars-git"
 getGIT https://github.com/szpajder/libacars "$branch" "$GIT"
 
 cd "$GIT"
+
+VERSION=$(git rev-parse HEAD)
+
+if grep -qs -e "$VERSION" "$ipath/libacars-installed"; then
+    echo "---------------------------------------------"
+    echo "skipping libacars install - already latest version"
+    echo "to force reinstall: sudo rm -f $ipath/libacars-installed; sudo bash $ipath/git/libacars/install.sh"
+    echo "---------------------------------------------"
+    exit 0
+fi
 
 rm -rf build
 mkdir build
@@ -50,4 +61,4 @@ make install
 
 ldconfig
 
-touch "$ipath/libacars-installed"
+echo "$VERSION" > "$ipath/libacars-installed"
