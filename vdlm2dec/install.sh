@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd)/$(basename "$0")"
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
 
@@ -68,3 +69,7 @@ cp -T vdlm2dec $BIN
 
 systemctl enable vdlm2dec
 systemctl restart vdlm2dec
+
+echo "-----------------------------------"
+echo "$SCRIPT_PATH completed successfully"
+echo "-----------------------------------"

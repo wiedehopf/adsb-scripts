@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd)/$(basename "$0")"
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
 
@@ -68,3 +69,7 @@ cp -T acarsdec $BIN
 
 systemctl enable acarsdec
 systemctl restart acarsdec
+
+echo "-----------------------------------"
+echo "$SCRIPT_PATH completed successfully"
+echo "-----------------------------------"
