@@ -55,7 +55,7 @@ function aptInstall() {
 }
 
 if command -v apt &>/dev/null; then
-    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 ncurses-dev ncurses-bin zlib1g-dev zlib1g)
+    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 ncurses-dev ncurses-bin zlib1g-dev zlib1g busybox)
     if ! grep -E 'wheezy|jessie' /etc/os-release -qs; then
         packages+=(libzstd-dev libzstd1)
     fi
@@ -121,7 +121,7 @@ rm -f /usr/bin/readsb /usr/bin/viewadsb
 cp -f readsb /usr/bin/readsb
 cp -f viewadsb /usr/bin/viewadsb
 
-cp --update=none debian/readsb.default /etc/default/readsb
+busybox cp -n debian/readsb.default /etc/default/readsb
 
 if ! id -u readsb &>/dev/null
 then
@@ -140,7 +140,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 if [[ -f /etc/rbfeeder.ini ]]; then
     systemctl stop rb-feeder &>/dev/null || true
-    cp --update=none /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
+    busybox cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
     sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
     sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
     cat >>/etc/rbfeeder.ini <<"EOF"
@@ -160,7 +160,7 @@ then
     systemctl stop fr24feed &>/dev/null || true
     chmod a+rw /etc/fr24feed.ini || true
     apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
-    cp --update=none /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
+    busybox cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
 
     if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
     if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
