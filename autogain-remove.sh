@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 rm -f /usr/local/bin/autogain1090
 rm -f /etc/default/autogain1090

@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 cd /tmp
 
 # remove old version:

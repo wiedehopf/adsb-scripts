@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 trap "exit" INT TERM
 trap "kill 0" EXIT

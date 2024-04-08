@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 if [ "$(id -u)" != "0" ]; then
     echo -e "\033[33m"

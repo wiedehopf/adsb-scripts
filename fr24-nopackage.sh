@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 apt update
 apt install -y perl wget

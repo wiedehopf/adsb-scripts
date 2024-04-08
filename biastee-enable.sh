@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 renice 10 $$
 set -e
 function aptInstall() {

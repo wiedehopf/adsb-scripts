@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts

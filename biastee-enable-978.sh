@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 renice 10 $$
 set -e
 if ! command -v git &>/dev/null || ! command -v cmake &>/dev/null; then

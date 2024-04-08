@@ -1,4 +1,5 @@
 #!/bin/bash
+umask 022
 
 set -e
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
