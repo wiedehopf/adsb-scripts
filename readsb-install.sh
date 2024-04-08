@@ -61,13 +61,17 @@ function aptInstall() {
 }
 
 if command -v apt &>/dev/null; then
-    packages=(git gcc make libusb-1.0-0-dev librtlsdr-dev librtlsdr0 ncurses-dev ncurses-bin zlib1g-dev zlib1g)
+    packages=(git gcc make libusb-1.0-0-dev ncurses-dev ncurses-bin zlib1g-dev zlib1g)
     if ! grep -E 'wheezy|jessie' /etc/os-release -qs; then
         packages+=(libzstd-dev libzstd1)
     fi
     if ! command -v nginx &>/dev/null; then
         packages+=(lighttpd)
     fi
+    aptInstall "${packages[@]}"
+fi
+if command -v apt &>/dev/null; then
+    packages=(librtlsdr-dev librtlsdr0)
     aptInstall "${packages[@]}"
 fi
 
