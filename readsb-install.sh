@@ -53,11 +53,7 @@ fi
 function aptInstall() {
     if ! apt install -y --no-install-recommends --no-install-suggests "$@" &>/dev/null; then
         apt update
-        if ! apt install -y --no-install-recommends --no-install-suggests "$@"; then
-            apt clean -y || true
-            apt --fix-broken install -y || true
-            apt install --no-install-recommends --no-install-suggests -y $packages
-        fi
+        apt install -y --no-install-recommends --no-install-suggests "$@"
     fi
 }
 
@@ -73,7 +69,7 @@ if command -v apt &>/dev/null; then
 fi
 if command -v apt &>/dev/null; then
     packages=(librtlsdr-dev librtlsdr0)
-    aptInstall "${packages[@]}"
+    aptInstall "${packages[@]}" || true # hope for the best
 fi
 
 udevadm control --reload-rules || true
