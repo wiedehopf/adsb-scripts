@@ -19,6 +19,12 @@ if [ -f /boot/piaware-config.txt ]; then
     exit 1
 fi
 
+function copyNoClobber() {
+    if ! [[ -f "$2" ]]; then
+        cp "$1" "$2"
+    fi
+}
+
 repository="https://github.com/wiedehopf/readsb.git"
 
 if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
@@ -121,7 +127,7 @@ rm -f /usr/bin/readsb /usr/bin/viewadsb
 cp -f readsb /usr/bin/readsb
 cp -f viewadsb /usr/bin/viewadsb
 
-cp -n debian/readsb.default /etc/default/readsb
+copyNoClobber debian/readsb.default /etc/default/readsb
 
 if ! id -u readsb &>/dev/null
 then
@@ -140,7 +146,7 @@ rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 if [[ -f /etc/rbfeeder.ini ]]; then
     systemctl stop rb-feeder &>/dev/null || true
-    cp -n /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
+    copyNoClobber /etc/rbfeeder.ini /usr/local/share/adsb-wiki || true
     sed -i -e '/network_mode/d' -e '/\[network\]/d' -e '/mode=/d' -e '/external_port/d' -e '/external_host/d' /etc/rbfeeder.ini
     sed -i -e 's/\[client\]/\0\nnetwork_mode=true/' /etc/rbfeeder.ini
     cat >>/etc/rbfeeder.ini <<"EOF"
@@ -160,7 +166,7 @@ then
     systemctl stop fr24feed &>/dev/null || true
     chmod a+rw /etc/fr24feed.ini || true
     apt-get install -y dos2unix &>/dev/null && dos2unix /etc/fr24feed.ini &>/dev/null || true
-    cp -n /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
+    copyNoClobber /etc/fr24feed.ini /usr/local/share/adsb-wiki || true
 
     if ! grep -e 'host=' /etc/fr24feed.ini &>/dev/null; then echo 'host=' >> /etc/fr24feed.ini; fi
     if ! grep -e 'receiver=' /etc/fr24feed.ini &>/dev/null; then echo 'receiver=' >> /etc/fr24feed.ini; fi
