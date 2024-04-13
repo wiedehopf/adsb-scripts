@@ -20,6 +20,21 @@ if [ -f /boot/piaware-config.txt ]; then
     exit 1
 fi
 
+for arg in "$@"
+do
+    case "$arg" in
+        push-30004)
+            push_30004=yes
+            ;;
+        no-tar1090)
+            NO_TAR1090=yes
+            ;;
+        *)
+            MAKE_ARGS=yes
+            ;;
+    esac
+done
+
 function copyNoClobber() {
     if ! [[ -f "$2" ]]; then
         cp "$1" "$2"
@@ -27,6 +42,20 @@ function copyNoClobber() {
 }
 
 repository="https://github.com/wiedehopf/readsb.git"
+
+
+if [[ -n "$push_30004" ]]; then
+cat >/etc/default/readsb <<"EOF"
+# readsb configuration
+# This is sourced by /etc/systemd/system/default.target.wants/readsb.service as
+# daemon startup configuration.
+
+RECEIVER_OPTIONS="--device 0 --device-type rtlsdr --gain -10 --ppm 0"
+DECODER_OPTIONS="--max-range 450 --write-json-every 1 --net-connector 127.0.0.1,30004,beast_out"
+NET_OPTIONS="--net --net-heartbeat 60 --net-ro-size 1280 --net-ro-interval 0.05 --net-ri-port 20001 --net-ro-port 20002 --net-sbs-port 20003 --net-bi-port 20004,20104 --net-bo-port 20005"
+JSON_OPTIONS="--json-location-accuracy 2 --range-outline-hours 24"
+EOF
+fi
 
 if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
@@ -62,7 +91,7 @@ if command -v apt &>/dev/null; then
     if ! grep -E 'wheezy|jessie' /etc/os-release -qs; then
         packages+=(libzstd-dev libzstd1)
     fi
-    if ! command -v nginx &>/dev/null; then
+    if ! command -v nginx &>/dev/null && [[ -z "$NO_TAR1090" ]] ; then
         packages+=(lighttpd)
     fi
     aptInstall "${packages[@]}"
@@ -113,13 +142,18 @@ fi
 if [[ $1 == "sanitize" ]]; then
     CFLAGS+="-fsanitize=address -static-libasan"
     if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"; then
-        if grep -qs /etc/os-release 'bullseye'; then apt install -y libasan6;
+        if grep -qs /etc/os-release 'bookworm'; then apt install -y libasan8;
+        elif grep -qs /etc/os-release 'bullseye'; then apt install -y libasan6;
         elif grep -qs /etc/os-release 'buster'; then apt install -y libasan5;
         fi
         make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
     fi
 else
-    make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS" "$@"
+    if [[ -n "$MAKE_ARGS" ]]; then
+        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS" "$@"
+    else
+        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
+    fi
 fi
 
 cp -f debian/readsb.service /lib/systemd/system/readsb.service
@@ -244,8 +278,10 @@ chmod a+x /usr/local/bin/readsb-set-location
 echo --------------
 cd "$ipath"
 
-wget -O tar1090-install.sh https://raw.githubusercontent.com/wiedehopf/tar1090/master/install.sh
-bash tar1090-install.sh /run/readsb
+if [[ -z "$NO_TAR1090" ]] ; then
+    wget -O tar1090-install.sh https://raw.githubusercontent.com/wiedehopf/tar1090/master/install.sh
+    bash tar1090-install.sh /run/readsb
+fi
 
 if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
     echo --------------
