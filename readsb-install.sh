@@ -298,7 +298,7 @@ if ! systemctl show readsb | grep 'ExecMainStatus=0' -qs; then
         echo "       common issues: SDR not plugged in."
         echo "       the webinterface will show an error until readsb is running!"
         echo "       If you can't fix the issue:"
-        echo "            Open a github issue or contact wiedehopf on the adsbexchange discord and post the above 30 lines of log!"
+        echo "            Open a github issue or contact wiedehopf on discord (https://discord.gg/DxU4VG37JS) and post the above 30 lines of log!"
         echo --------------
     fi
 else
