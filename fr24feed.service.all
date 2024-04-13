@@ -8,6 +8,7 @@ Restart=always
 ExecStartPre=-/bin/rm -f /dev/shm/decoder.txt
 ExecStopPost=-/bin/rm -f /dev/shm/decoder.txt
 ExecStart=/bin/bash -c "/usr/bin/fr24feed | sed -u -e 's/[0-9,-]* [0-9,:]* | //'"
+LimitNOFILE=1024
 User=fr24
 Group=fr24
 PermissionsStartOnly=true
