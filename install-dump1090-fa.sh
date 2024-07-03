@@ -31,8 +31,8 @@ function copyNoClobber() {
 
 if [[ -f /usr/lib/fr24/fr24feed_updater.sh ]]; then
     #fix readonly remount logic in fr24feed update script, doesn't do anything when fr24 is not installed
-    mount -o remount,rw /
-    sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null
+    mount -o remount,rw / &>/dev/null || true
+    sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null || true
 fi
 
 ipath=/usr/local/share/adsb-wiki
