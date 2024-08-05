@@ -21,7 +21,7 @@ rm /tmp/fr24 -rf
 mkdir -p /tmp/fr24
 cd /tmp
 
-wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.46-2_armhf.deb
+wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.48-0_armhf.deb
 
 dpkg -x fr24.deb fr24
 cp -f fr24/usr/bin/fr24feed* /usr/bin
