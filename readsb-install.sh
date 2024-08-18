@@ -87,7 +87,7 @@ function aptInstall() {
 }
 
 if command -v apt &>/dev/null; then
-    packages=(git gcc make libusb-1.0-0-dev ncurses-dev ncurses-bin zlib1g-dev zlib1g pkg-config)
+    packages=(git gcc make libusb-1.0-0-dev ncurses-dev ncurses-bin zlib1g-dev zlib1g pkg-config libc6-dev)
     if ! grep -E 'wheezy|jessie' /etc/os-release -qs; then
         packages+=(libzstd-dev libzstd1)
     fi
