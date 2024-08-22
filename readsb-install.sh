@@ -94,9 +94,12 @@ if command -v apt &>/dev/null; then
     if ! command -v nginx &>/dev/null && [[ -z "$NO_TAR1090" ]] ; then
         packages+=(lighttpd)
     fi
-    # librtlsdr0 is pulled in by librtlsdr-dev anyhow, thus omit it.
-    # this is to get compatibility with ubuntu24 which didn't manage to revert the needless library version change that was reverted upstream
-    packages=(librtlsdr-dev)
+    packages+=(librtlsdr-dev)
+    if grep -qs -e 'Ubuntu 24' /etc/os-release; then
+        packages+=(librtlsdr2)
+    else
+        packages+=(librtlsdr0)
+    fi
     aptInstall "${packages[@]}"
 fi
 
