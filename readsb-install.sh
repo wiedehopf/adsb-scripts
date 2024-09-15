@@ -20,6 +20,11 @@ if [ -f /boot/piaware-config.txt ]; then
     exit 1
 fi
 
+BRANCH="stale"
+if grep -E 'wheezy|jessie' /etc/os-release -qs; then
+    BRANCH="jessie"
+fi
+
 for arg in "$@"
 do
     case "$arg" in
@@ -28,6 +33,9 @@ do
             ;;
         no-tar1090)
             NO_TAR1090=yes
+            ;;
+        sid)
+            BRANCH="sid"
             ;;
         *)
             MAKE_ARGS=yes
@@ -118,10 +126,6 @@ function getGIT() {
     fi
     return 0
 }
-BRANCH="stale"
-if grep -E 'wheezy|jessie' /etc/os-release -qs; then
-    BRANCH="jessie"
-fi
 if ! getGIT "$repository" "$BRANCH" "$ipath/git"
 then
     echo "Unable to git clone the repository"
