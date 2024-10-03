@@ -1,0 +1,10 @@
+[Unit]
+Description=zram-swap - use zram as swap
+Documentation=https://github.com/wiedehopf/adsb-scripts/wiki/zram-swap
+
+[Service]
+ExecStart=/bin/bash /usr/local/share/adsb-scripts/zram-swap/zram-swap.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
