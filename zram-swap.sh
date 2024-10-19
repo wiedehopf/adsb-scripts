@@ -25,8 +25,8 @@ function vm_tweaks () {
     # This factor controls the aggressiveness of kswapd. It defines the amount
     # of memory left in a node/system before kswapd is woken up and how much
     # memory needs to be free before kswapd goes back to sleep.
-    # 60: 0.6 percent free memory (default 10 / 0.1%)
-    echo 60 > /proc/sys/vm/watermark_scale_factor
+    # 80: 0.8 percent free memory (default 10 / 0.1%)
+    echo 80 > /proc/sys/vm/watermark_scale_factor
 
     # watermark_boost_factor
     # this has to do with reclaiming on fragmentation, but with almost no memory available it can lead to kswapd thrashing
@@ -108,13 +108,25 @@ done
 # LZ4 default (v1.9.0)  2.101   780 MB/s    4970 MB/s
 # Zstandard 1.4.0 -1    2.883   515 MB/s    1380 MB/s
 #
-# on a pi4, lz4 in compression has even higher relative speed over zstd
-# use zstd for now even though it's slower
-#echo lz4 > "/sys/block/$NAME/comp_algorithm"
-echo zstd > "/sys/block/$NAME/comp_algorithm"
+# pi4b:
+# Testing using first 100MB of chrome binary:
+#
+# zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd zstd
+# from /run to zram: 104857600 bytes (105 MB, 100 MiB) copied, 2.78112 s, 37.7 MB/s
+# from zram to /run: 104857600 bytes (105 MB, 100 MiB) copied, 0.904138 s, 116 MB/s
+# uncompressed:  100.8M  compressed:  49.5M
+#
+# lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4 lz4
+# from /run to zram: 104857600 bytes (105 MB, 100 MiB) copied, 1.21295 s, 86.4 MB/s
+# from zram to /run: 104857600 bytes (105 MB, 100 MiB) copied, 0.436038 s, 240 MB/s
+# uncompressed:  100.8M  compressed:  62.5M
+#
+echo lz4 > "/sys/block/$NAME/comp_algorithm"
+
+mem_kbytes="$(grep -e MemTotal /proc/meminfo | tr -s ' ' | cut -d' ' -f2)"
 
 # use 1/4 of memory
-use=$(( $(grep -e MemTotal /proc/meminfo | tr -s ' ' | cut -d' ' -f2) / 4 ))
+use=$(( mem_kbytes / 4 ))
 
 # use at least 256M for systems with small memory
 min=$(( 256 * 1024 ))
