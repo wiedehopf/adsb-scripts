@@ -15,6 +15,7 @@ if ! command -v inotifywait || ! command -v s6wrap; then
 fi
 
 pkill inotifywait || true
+rm -f /run/inotify.log
 
 echo 192000 > /proc/sys/fs/inotify/max_user_watches
 s6wrap --timestamps --args inotifywait -r -m /etc /opt /root /home /usr /lib /boot /var \
