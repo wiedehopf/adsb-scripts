@@ -31,6 +31,9 @@ do
         push-30004)
             push_30004=yes
             ;;
+        binary-only)
+            BINARY_ONLY=yes
+            ;;
         no-tar1090)
             NO_TAR1090=yes
             ;;
@@ -112,6 +115,7 @@ if command -v apt &>/dev/null; then
 fi
 
 udevadm control --reload-rules || true
+udevadm trigger || true
 
 function getGIT() {
     # getGIT $REPO $BRANCH $TARGET-DIR
@@ -162,13 +166,19 @@ else
     fi
 fi
 
-cp -f debian/readsb.service /lib/systemd/system/readsb.service
 
 rm -f /usr/bin/readsb /usr/bin/viewadsb
 cp -f readsb /usr/bin/readsb
 cp -f viewadsb /usr/bin/viewadsb
 
+cp -f debian/readsb.service /lib/systemd/system/readsb.service
 copyNoClobber debian/readsb.default /etc/default/readsb
+
+if [[ -n "$BINARY_ONLY" ]]; then
+    systemctl restart readsb
+    echo /usr/bin/readsb has been replaced with an updated version
+    exit 0
+fi
 
 if ! id -u readsb &>/dev/null
 then
