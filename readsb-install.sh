@@ -182,9 +182,9 @@ fi
 
 if ! id -u readsb &>/dev/null
 then
-    adduser --system --home $ipath --no-create-home --quiet readsb || adduser --system --home-dir $ipath --no-create-home readsb
-    adduser readsb plugdev || true # USB access
-    adduser readsb dialout || true # serial access
+    adduser --system --no-create-home readsb
+    adduser readsb plugdev # SDR access (via udev rules)
+    adduser readsb dialout # serial access
 fi
 
 apt remove -y dump1090-fa &>/dev/null || true
