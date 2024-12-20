@@ -188,8 +188,8 @@ then
 fi
 
 apt remove -y dump1090-fa &>/dev/null || true
-systemctl disable --now dump1090-mutability &>/dev/null || true
-systemctl disable --now dump1090 &>/dev/null || true
+apt remove -y dump1090-mutability &>/dev/null || true
+apt remove -y dump1090 &>/dev/null || true
 
 rm -f /etc/lighttpd/conf-enabled/89-dump1090.conf
 
