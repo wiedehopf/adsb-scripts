@@ -106,7 +106,7 @@ if command -v apt &>/dev/null; then
         packages+=(lighttpd)
     fi
     packages+=(librtlsdr-dev)
-    if grep -qs -e 'Ubuntu 24' /etc/os-release; then
+    if grep -qs -e 'Ubuntu 24.04' /etc/os-release; then
         packages+=(librtlsdr2)
     else
         packages+=(librtlsdr0)
