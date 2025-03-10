@@ -19,7 +19,7 @@ function vm_tweaks () {
     # swappiness
     # if zram is the only swap, increase swappiness (default swappiness 60)
     # zram guides propose 200 but that seems excessive
-    echo 100 > /proc/sys/vm/swappiness
+    echo 90 > /proc/sys/vm/swappiness
 
     # watermark_scale_factor
     # This factor controls the aggressiveness of kswapd. It defines the amount
@@ -51,7 +51,7 @@ function vm_tweaks () {
     echo 0 > /proc/sys/vm/page-cluster
 
     # raise vfs_cache_pressure a bit, default 100
-    echo 200 > /proc/sys/vm/vfs_cache_pressure
+    echo 150 > /proc/sys/vm/vfs_cache_pressure
 
     # write cache is less important with non-spinning disks
     # reduce the defaults to reduce write cache memory use just in case we're mem limited
