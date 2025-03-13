@@ -91,9 +91,9 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
 fi
 
 function aptInstall() {
-    if ! apt install -y --no-install-recommends --no-install-suggests "$@" &>/dev/null; then
-        apt update
-        apt install -y --no-install-recommends --no-install-suggests "$@"
+    if ! DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests "$@" &>/dev/null; then
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests "$@"
     fi
 }
 
@@ -152,9 +152,9 @@ fi
 if [[ $1 == "sanitize" ]]; then
     CFLAGS+="-fsanitize=address -static-libasan"
     if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"; then
-        if grep -qs /etc/os-release 'bookworm'; then apt install -y libasan8;
-        elif grep -qs /etc/os-release 'bullseye'; then apt install -y libasan6;
-        elif grep -qs /etc/os-release 'buster'; then apt install -y libasan5;
+        if grep -qs /etc/os-release 'bookworm'; then aptInstall libasan8;
+        elif grep -qs /etc/os-release 'bullseye'; then aptInstall libasan6;
+        elif grep -qs /etc/os-release 'buster'; then aptInstall libasan5;
         fi
         make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
     fi
