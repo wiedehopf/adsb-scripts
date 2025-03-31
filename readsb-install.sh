@@ -151,18 +151,18 @@ fi
 
 if [[ $1 == "sanitize" ]]; then
     CFLAGS+="-fsanitize=address -static-libasan"
-    if ! make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"; then
+    if ! make "-j${THREADS}" RTLSDR=yes OPTIMIZE="$CFLAGS"; then
         if grep -qs /etc/os-release 'bookworm'; then aptInstall libasan8;
         elif grep -qs /etc/os-release 'bullseye'; then aptInstall libasan6;
         elif grep -qs /etc/os-release 'buster'; then aptInstall libasan5;
         fi
-        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
+        make "-j${THREADS}" RTLSDR=yes OPTIMIZE="$CFLAGS"
     fi
 else
     if [[ -n "$MAKE_ARGS" ]]; then
-        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS" "$@"
+        make "-j${THREADS}" RTLSDR=yes OPTIMIZE="$CFLAGS" "$@"
     else
-        make "-j${THREADS}" AIRCRAFT_HASH_BITS=16 RTLSDR=yes OPTIMIZE="$CFLAGS"
+        make "-j${THREADS}" RTLSDR=yes OPTIMIZE="$CFLAGS"
     fi
 fi
 
