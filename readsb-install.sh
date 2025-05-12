@@ -28,6 +28,9 @@ fi
 for arg in "$@"
 do
     case "$arg" in
+        tag=*)
+            BRANCH=$(cut -d= -f2 <<< "$arg")
+            ;;
         push-30004)
             push_30004=yes
             ;;
