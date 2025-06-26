@@ -9,11 +9,11 @@ cd /tmp
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
-stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
+stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libairspy-dev"
 branch="master"
 
-if [[ -n $1 ]]; then
-    branch="$1"
+if [[ -n $2 ]]; then
+    branch="$2"
 fi
 
 apt install -y $stuff || apt update && apt install -y $stuff || true
@@ -40,6 +40,11 @@ cd "$ipath/git/vdlm2dec"
 cp service /lib/systemd/system/vdlm2dec.service
 cp -n default /etc/default/vdlm2dec
 
+if [[ $1 == "airspy" ]]; then
+    sed -i -e 's/User=vdlm2dec/User=root/' /lib/systemd/system/vdlm2dec.service
+    sed -i -e 's/^OPTIONS7=*/#\0/' /etc/default/vdlm2dec
+fi
+
 sed -i -e "s/XX-YYYYZ/$RANDOM-$RANDOM/" /etc/default/vdlm2dec
 
 # blacklist kernel driver as on ancient systems
@@ -61,7 +66,11 @@ cd "$GIT"
 rm -rf build
 mkdir build
 cd build
-cmake .. -Drtl=ON
+if [[ $1 == "airspy" ]]; then
+    cmake .. -Dairspy=ON
+else
+    cmake .. -Drtl=ON
+fi
 make -j2
 
 BIN=/usr/local/bin/vdlm2dec
