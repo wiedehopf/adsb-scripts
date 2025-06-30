@@ -21,7 +21,13 @@ rm /tmp/fr24 -rf
 mkdir -p /tmp/fr24
 cd /tmp
 
-wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.51-0_armhf.deb
+arch=$(dpkg --print-architecture)
+if [[ $arch == amd64 ]] || [[ $arch == arm64 ]] || [[ $arch == i386 ]]; then
+    wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.51-0_${arch}.deb
+else
+    # fallback to armhf
+    wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.51-0_armhf.deb
+fi
 
 dpkg -x fr24.deb fr24
 cp -f fr24/usr/bin/fr24feed* /usr/bin
