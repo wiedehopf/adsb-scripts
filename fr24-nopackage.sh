@@ -1,6 +1,8 @@
 #!/bin/bash
 umask 022
 
+trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
+
 apt update
 apt install -y perl wget
 
@@ -40,6 +42,8 @@ mlat="no"
 mlat-without-gps="no"
 EOF
 fi
+
+sed -i -e 's/^bs=.*/bs=no/' -e 's/^raw=.*/raw=no/' /etc/fr24feed.ini
 
 chmod 666 /etc/fr24feed.ini
 
