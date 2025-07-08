@@ -60,6 +60,7 @@ cd "$GIT"
 rm -rf build
 mkdir build
 cd build
+sed -i -e 's/#define RTL_OVERSAMPLE.*/#define RTL_OVERSAMPLE 12/' ../src/rtl.h
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j2
 
