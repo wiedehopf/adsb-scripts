@@ -9,7 +9,7 @@ cd /tmp
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
-stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0"
+stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libcjson-dev"
 branch="master"
 
 if [[ -n $1 ]]; then
@@ -61,8 +61,8 @@ cd "$GIT"
 rm -rf build
 mkdir build
 cd build
-cmake .. -Drtl=ON
-make -j2
+cmake ..
+make -j3
 
 BIN=/usr/local/bin/acarsdec
 rm -f $BIN

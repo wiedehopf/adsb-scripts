@@ -1,4 +1,4 @@
-OPTIONS0= -v -o 4 -j feed.acars.io:5550
+OPTIONS0= --output json:udp:host=feed.acars.io,port=5550
 
 # station name for acars.io:
 OPTIONS1= -i XX-YYYYZ
@@ -6,14 +6,16 @@ OPTIONS1= -i XX-YYYYZ
 # gain for rtl-sdr, for example 43.9 and -10 or 55 for AGC
 OPTIONS2= -g 55
 
-# change to -m 192 for 2.4 MS/s sample rate instead of 2.0 MS/s (might be a bit better)
-OPTIONS3= -m 160
+# -m is now automatically determined, no need to set it
+OPTIONS3=
+
+OPTIONS4= --output oneline:file
 
 # to have the messages written to disk instead of the journal, uncomment the following line:
-# OPTIONS4= -l /var/tmp/acarsdec
+# OPTIONS4= --output native:file:path=/var/tmp/acarsdec
 
 # rtl-sdr device id or serial:
-OPTIONS7= -r 0
+OPTIONS7= --rtlsdr 0
 
 # frequencies scanned:
 OPTIONS8= 130.025 130.450 131.125 131.525 131.550 131.725 131.825
