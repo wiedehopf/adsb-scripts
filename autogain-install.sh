@@ -112,9 +112,9 @@ strong=$percent
 if [[ $strong == "nan" ]]; then echo "Error, can't automatically adjust gain!"; exit 1; fi
 
 if [ -f /boot/adsb-config.txt ]; then
-    oldgain=$(grep -P -e 'GAIN=\K[0-9-.]*' -o /boot/adsb-config.txt)
+    oldgain=$(grep -P -e '^(?=[\s]*+[^#])[^#]*GAIN=\K[0-9-.]*' -o /boot/adsb-config.txt)
 else
-    oldgain=$(grep -P -e 'gain \K[0-9-.]*' -o /etc/default/$APP)
+    oldgain=$(grep -P -e '^(?=[\s]*+[^#])[^#]*gain \K[0-9-.]*' -o /etc/default/$APP)
 fi
 
 if [[ "$oldgain" == "" ]]; then
@@ -178,7 +178,7 @@ else
     if ! grep gain /etc/default/$APP &>/dev/null && grep -E 'device-type.*rtlsdr' /etc/default/$APP &>/dev/null; then
       sed --follow-symlinks -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/$APP
     fi
-    sed --follow-symlinks -i -E -e "s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
+    sed --follow-symlinks -i -E -e "/^[[:space:]]*#/b; /--gain/ s/--gain -?[0-9]*\.?[0-9]*/--gain $gain/" /etc/default/$APP
 fi
 
 systemctl restart $APP
