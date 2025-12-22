@@ -243,7 +243,7 @@ validre='^([^ ]*)$'
 gain="$1"
 if ! [[ $gain =~ $validre ]] ; then echo "Error, invalid gain!"; exit 1; fi
 if ! grep gain /etc/default/readsb &>/dev/null; then sudo sed -i -e 's/RECEIVER_OPTIONS="/RECEIVER_OPTIONS="--gain 49.6 /' /etc/default/readsb; fi
-sudo sed -i -E -e "s/--gain[ =][^ \"]*/--gain $gain/" /etc/default/readsb
+sudo sed -i -E -e "/^[[:space:]]*#/b; /--gain/ s/--gain[ =][^ \"]*/--gain $gain/" /etc/default/readsb
 echo "$gain" | sudo tee /run/readsb/setGain || sudo systemctl restart readsb
 EOF
 chmod a+x /usr/local/bin/readsb-gain
