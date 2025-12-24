@@ -24,7 +24,9 @@ mkdir -p /tmp/fr24
 cd /tmp
 
 arch=$(dpkg --print-architecture)
-if [[ $arch == amd64 ]] || [[ $arch == arm64 ]] || [[ $arch == i386 ]]; then
+if [[ $arch == amd64 ]] || [[ $arch == i386 ]]; then
+    wget -O fr24.deb https://repo-feed.flightradar24.com/linux_binaries/fr24feed_1.0.54-0_${arch}.deb
+elif [[ $arch == arm64 ]]; then
     wget -O fr24.deb https://repo-feed.flightradar24.com/rpi_binaries/fr24feed_1.0.54-0_${arch}.deb
 else
     # fallback to armhf
