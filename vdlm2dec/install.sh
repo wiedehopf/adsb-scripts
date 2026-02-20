@@ -9,7 +9,7 @@ cd /tmp
 
 repo="https://github.com/wiedehopf/adsb-scripts"
 ipath=/usr/local/share/adsb-scripts
-stuff="git cmake libusb-1.0-0-dev librtlsdr-dev librtlsdr0 libairspy-dev"
+stuff="git cmake libusb-1.0-0-dev librtlsdr-dev libairspy-dev"
 branch="master"
 
 if [[ -n $2 ]]; then
