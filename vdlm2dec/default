@@ -9,9 +9,13 @@ OPTIONS2= -g 439
 # to have the messages written to disk instead of the journal, uncomment the following line:
 # OPTIONS4= -l /var/tmp/vdlm2dec
 
+OPTIONS5=
+OPTIONS6=
+
 # rtl-sdr device id or serial:
 OPTIONS7= -r 0
 
 # frequencies scanned:
 OPTIONS8= 136.650 136.800 136.975
 
+OPTIONS9=

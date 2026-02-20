@@ -14,9 +14,13 @@ OPTIONS4= --output oneline:file
 # to have the messages written to disk instead of the journal, uncomment the following line:
 # OPTIONS4= --output native:file:path=/var/tmp/acarsdec
 
+OPTIONS5=
+OPTIONS6=
+
 # rtl-sdr device id or serial:
 OPTIONS7= --rtlsdr 0
 
 # frequencies scanned:
 OPTIONS8= 130.025 130.450 131.125 131.525 131.550 131.725 131.825
 
+OPTIONS9=
