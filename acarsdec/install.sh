@@ -24,7 +24,7 @@ function getGIT() {
     # getGIT $REPO $BRANCH $TARGET (directory)
     if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then echo "getGIT wrong usage, check your script or tell the author!" 1>&2; return 1; fi
     REPO="$1"; BRANCH="$2"; TARGET="$3"; pushd .
-    if cd "$TARGET" &>/dev/null && git set-url origin "$REPO" &&  git fetch --depth 1 origin "$BRANCH" && git reset --hard FETCH_HEAD; then popd; return 0; fi
+    if cd "$TARGET" &>/dev/null && git remote set-url origin "$REPO" &&  git fetch --depth 1 origin "$BRANCH" && git reset --hard FETCH_HEAD; then popd; return 0; fi
     if ! cd /tmp || ! rm -rf "$TARGET"; then popd; return 1; fi
     if git clone --depth 1 --single-branch --branch "$2" "$1" "$3"; then popd; return 0; fi
     popd; return 1;
